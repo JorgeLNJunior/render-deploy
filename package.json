@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "@jorgelnjunior/render-deploy",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "A simple action to trigger a render.com app deploy",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/JorgeLNJunior/render-deploy.git"
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "render",
+    "deploy"
   ],
-  "author": "",
+  "author": "JorgeLNJunior",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.0"
