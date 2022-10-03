@@ -5,5 +5,6 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest'
   },
-  verbose: true
+  verbose: true,
+  collectCoverageFrom: ['src/**/*.(t|j)s', '!src/main.ts']
 }
