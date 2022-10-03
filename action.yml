@@ -1,11 +1,13 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Deploy to render'
+description: 'Trigger a render.com service deploy'
+author: 'JorgeLNJunior'
 inputs:
-  milliseconds: # change this
+  service_id:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'render service id'
+  api_key:
+    required: true
+    description: 'render api key'
 runs:
   using: 'node16'
   main: 'dist/index.js'
