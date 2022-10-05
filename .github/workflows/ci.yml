@@ -57,6 +57,7 @@ jobs:
       - run: |
           git add .
           git commit -m "build: package all build files"
+          git push
 
   release:
     runs-on: ubuntu-latest
