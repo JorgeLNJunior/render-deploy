@@ -6,7 +6,7 @@
     },
     "hooks": {
       "after:bump": "npx auto-changelog -p --commit-limit false && git add CHANGELOG.md",
-      "after:release": "git checkout develop && git merge main && git push"
+      "after:release": "git checkout develop && git merge main && git pull && git push"
     },
     "github": {
       "release": true,
