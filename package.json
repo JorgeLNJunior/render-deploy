@@ -1,6 +1,6 @@
 {
   "name": "@jorgelnjunior/render-deploy",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "A simple action to trigger a render.com app deploy",
   "main": "lib/main.js",
@@ -47,7 +47,7 @@
     "js-yaml": "^4.1.0",
     "lint-staged": "^13.0.3",
     "prettier": "2.7.1",
-    "release-it": "^15.4.3",
+    "release-it": "^15.5.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.0.3",
     "typescript": "^4.8.4"
