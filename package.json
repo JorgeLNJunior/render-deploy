@@ -1,6 +1,6 @@
 {
   "name": "@jorgelnjunior/render-deploy",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "A simple action to trigger a render.com app deploy",
   "main": "lib/main.js",
@@ -30,7 +30,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "axios": "^0.27.2"
+    "axios": "^1.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
