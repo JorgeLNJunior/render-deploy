@@ -28,10 +28,10 @@
 ```yml
 steps:
     - uses: actions/checkout@v3
-    - uses: JorgeLNJunior/render-deploy@v1.0.0
-      width:
-        - service_id: ${{ secrets.RENDER_SERVICE_ID }}
-        - api_key: ${{ secrets.RENDER_API_KEY }}
+    - uses: JorgeLNJunior/render-deploy@v1.0.1
+      with:
+        service_id: ${{ secrets.RENDER_SERVICE_ID }}
+        api_key: ${{ secrets.RENDER_API_KEY }}
 ```
 
 ## Licence
