@@ -30,7 +30,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "axios": "^1.0.0"
+    "axios": "^1.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
