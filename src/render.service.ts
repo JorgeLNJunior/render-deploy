@@ -12,9 +12,15 @@ export class RenderService {
     })
   }
 
-  async triggerDeploy(): Promise<void> {
-    await this.client.post('/deploys')
+  async triggerDeploy(options: DeployOptions): Promise<void> {
+    await this.client.post('/deploys', {
+      clearCache: options.clearCache ? 'clear' : 'do_not_clear'
+    })
   }
+}
+
+type DeployOptions = {
+  clearCache: boolean
 }
 
 type RenderOptions = {

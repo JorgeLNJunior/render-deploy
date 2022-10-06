@@ -8,8 +8,9 @@ export default class Action {
     try {
       const serviceId = core.getInput('service_id', {required: true})
       const apiKey = core.getInput('api_key', {required: true})
+      const clearCache = core.getBooleanInput('clear_cache')
 
-      await new RenderService({apiKey, serviceId}).triggerDeploy()
+      await new RenderService({apiKey, serviceId}).triggerDeploy({clearCache})
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.response?.status) {
