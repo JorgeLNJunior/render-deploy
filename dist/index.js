@@ -6388,11 +6388,13 @@ module.exports = require("zlib");
 /***/ }),
 
 /***/ 8757:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
-// Axios v1.0.0 Copyright (c) 2022 Matt Zabriskie and contributors
+// Axios v1.1.0 Copyright (c) 2022 Matt Zabriskie and contributors
 
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 const FormData$1 = __nccwpck_require__(4334);
 const url = __nccwpck_require__(7310);
@@ -6551,7 +6553,7 @@ const isPlainObject = (val) => {
   }
 
   const prototype = getPrototypeOf(val);
-  return prototype === null || prototype === Object.prototype;
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in val) && !(Symbol.iterator in val);
 };
 
 /**
@@ -7706,7 +7708,7 @@ function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 }
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 
 /**
  * A `CanceledError` is an object that is thrown when an operation is canceled.
@@ -8644,9 +8646,14 @@ function httpAdapter(config) {
 
     auth && headers.delete('authorization');
 
-    const path = parsed.pathname.concat(parsed.searchParams);
+    let path;
+
     try {
-      buildURL(path, config.params, config.paramsSerializer).replace(/^\?/, '');
+      path = buildURL(
+        parsed.pathname + parsed.search,
+        config.params,
+        config.paramsSerializer
+      ).replace(/^\?/, '');
     } catch (err) {
       const customErr = new Error(err.message);
       customErr.config = config;
@@ -8658,7 +8665,7 @@ function httpAdapter(config) {
     headers.set('Accept-Encoding', 'gzip, deflate, br', false);
 
     const options = {
-      path: buildURL(path, config.params, config.paramsSerializer).replace(/^\?/, ''),
+      path,
       method: method,
       headers: headers.toJSON(),
       agents: { http: config.httpAgent, https: config.httpsAgent },
@@ -10139,7 +10146,11 @@ axios.formToJSON = thing => {
   return formDataToJSON(utils.isHTMLForm(thing) ? new FormData(thing) : thing);
 };
 
-module.exports = axios;
+exports.Axios = Axios;
+exports.AxiosError = AxiosError;
+exports.AxiosHeaders = AxiosHeaders;
+exports.CanceledError = CanceledError;
+exports["default"] = axios;
 //# sourceMappingURL=axios.cjs.map
 
 
