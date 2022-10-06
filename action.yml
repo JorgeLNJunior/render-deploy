@@ -1,5 +1,5 @@
 name: 'Deploy to render'
-description: 'Trigger a render.com service deploy'
+description: 'Trigger a render service deploy'
 author: 'JorgeLNJunior'
 inputs:
   service_id:
@@ -11,3 +11,6 @@ inputs:
 runs:
   using: 'node16'
   main: 'dist/index.js'
+branding:
+  icon: 'upload-cloud'
+  color: 'green'
