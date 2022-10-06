@@ -4,10 +4,14 @@ author: 'JorgeLNJunior'
 inputs:
   service_id:
     required: true
-    description: 'render service id'
+    description: 'Render service id'
   api_key:
     required: true
-    description: 'render api key'
+    description: 'Render api key'
+  clear_cache:
+    required: false
+    default: false
+    description: 'Clear build cache'
 runs:
   using: 'node16'
   main: 'dist/index.js'
