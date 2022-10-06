@@ -1,5 +1,5 @@
 {
-    "plugins": ["@typescript-eslint"],
+    "plugins": ["@typescript-eslint", "simple-import-sort"],
     "extends": ["plugin:github/recommended"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -14,6 +14,7 @@
       "i18n-text/no-en": "off",
       "eslint-comments/no-use": "off",
       "import/no-namespace": "off",
+      "import/named": "off",
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/explicit-member-accessibility": ["error", {"accessibility": "no-public"}],
@@ -49,7 +50,9 @@
       "@typescript-eslint/semi": ["error", "never"],
       "@typescript-eslint/type-annotation-spacing": "error",
       "@typescript-eslint/unbound-method": "error",
-      "filenames/match-regex": "off"
+      "filenames/match-regex": "off",
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error"
     },
     "env": {
       "node": true,
