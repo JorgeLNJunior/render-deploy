@@ -49,7 +49,8 @@ class Action {
             try {
                 const serviceId = core.getInput('service_id', { required: true });
                 const apiKey = core.getInput('api_key', { required: true });
-                yield new render_service_1.RenderService({ apiKey, serviceId }).triggerDeploy();
+                const clearCache = core.getBooleanInput('clear_cache');
+                yield new render_service_1.RenderService({ apiKey, serviceId }).triggerDeploy({ clearCache });
             }
             catch (error) {
                 if (error instanceof axios_1.AxiosError) {
@@ -121,9 +122,11 @@ class RenderService {
             }
         });
     }
-    triggerDeploy() {
+    triggerDeploy(options) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.client.post('/deploys');
+            yield this.client.post('/deploys', {
+                clearCache: options.clearCache ? 'clear' : 'do_not_clear'
+            });
         });
     }
 }
