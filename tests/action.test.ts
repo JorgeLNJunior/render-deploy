@@ -29,6 +29,21 @@ describe('inputs', () => {
       'Input required and not supplied: api_key'
     )
   })
+
+  test('should call render api with clear_cache option', async () => {
+    process.env['INPUT_SERVICE_ID'] = 'my service id'
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = 'true'
+
+    const renderSpy = jest.spyOn(RenderService.prototype, 'triggerDeploy')
+
+    await new Action().run()
+
+    expect(renderSpy).toHaveBeenCalledTimes(1)
+    expect(renderSpy).toHaveBeenCalledWith({
+      clearCache: true
+    })
+  })
 })
 
 describe('deploy', () => {
