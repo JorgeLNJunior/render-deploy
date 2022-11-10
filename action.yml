@@ -1,5 +1,5 @@
-name: 'Deploy to render'
-description: 'Trigger a render service deploy'
+name: 'Deploy to Render'
+description: 'Trigger a Render service deploy'
 author: 'JorgeLNJunior'
 inputs:
   service_id:
@@ -13,7 +13,7 @@ inputs:
     default: false
     description: 'Clear build cache'
 runs:
-  using: 'node16'
+  using: 'node18'
   main: 'dist/index.js'
 branding:
   icon: 'upload-cloud'
