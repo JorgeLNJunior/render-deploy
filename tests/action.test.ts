@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {describe, expect, jest, test} from '@jest/globals'
 
 import Action from '../src/action'
-import {RenderService} from '../src/render.service'
+import {RenderErrorResponse, RenderService} from '../src/render.service'
 import {getAxiosError} from './helpers/axios.helper'
 
 describe('inputs', () => {
@@ -63,7 +63,7 @@ describe('deploy', () => {
 })
 
 describe('error handling', () => {
-  test('should exit with "invalid api key" if the server retuns 401', async () => {
+  test('should exit if the server retuns 401', async () => {
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
@@ -79,10 +79,10 @@ describe('error handling', () => {
     new Action().run()
 
     expect(coreSpy).toHaveBeenCalledTimes(1)
-    expect(coreSpy).toHaveBeenCalledWith('invalid api key')
+    expect(coreSpy).toHaveBeenCalledWith(RenderErrorResponse[401])
   })
 
-  test('should exit with "invalid service id" if the server retuns 404', async () => {
+  test('should exit if the server retuns 404', async () => {
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
@@ -98,10 +98,10 @@ describe('error handling', () => {
     new Action().run()
 
     expect(coreSpy).toHaveBeenCalledTimes(1)
-    expect(coreSpy).toHaveBeenCalledWith('invalid service id')
+    expect(coreSpy).toHaveBeenCalledWith(RenderErrorResponse[404])
   })
 
-  test('should exit with "too many requests" if the server retuns 429', async () => {
+  test('should exit if the server retuns 429', async () => {
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
@@ -117,10 +117,10 @@ describe('error handling', () => {
     new Action().run()
 
     expect(coreSpy).toHaveBeenCalledTimes(1)
-    expect(coreSpy).toHaveBeenCalledWith('too many requests')
+    expect(coreSpy).toHaveBeenCalledWith(RenderErrorResponse[429])
   })
 
-  test('should exit with "render api error" if the server retuns 500', async () => {
+  test('should exit if the server retuns 500', async () => {
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
@@ -136,10 +136,10 @@ describe('error handling', () => {
     new Action().run()
 
     expect(coreSpy).toHaveBeenCalledTimes(1)
-    expect(coreSpy).toHaveBeenCalledWith('render api error')
+    expect(coreSpy).toHaveBeenCalledWith(RenderErrorResponse[500])
   })
 
-  test('should exit with "render api unavailable" if the server retuns 503', async () => {
+  test('should exit if the server retuns 503', async () => {
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
@@ -155,6 +155,25 @@ describe('error handling', () => {
     new Action().run()
 
     expect(coreSpy).toHaveBeenCalledTimes(1)
-    expect(coreSpy).toHaveBeenCalledWith('render api unavailable')
+    expect(coreSpy).toHaveBeenCalledWith(RenderErrorResponse[503])
+  })
+
+  test('should exit if the server retuns an unexpected message', async () => {
+    process.env['INPUT_SERVICE_ID'] = 'my service id'
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = 'false'
+
+    const coreSpy = jest.spyOn(core, 'setFailed')
+
+    jest
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockImplementation(() => {
+        throw getAxiosError(507)
+      })
+
+    new Action().run()
+
+    expect(coreSpy).toHaveBeenCalledTimes(1)
+    expect(coreSpy).toHaveBeenCalledWith('Unexpected error')
   })
 })
