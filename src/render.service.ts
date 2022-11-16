@@ -19,11 +19,28 @@ export class RenderService {
   }
 }
 
-type DeployOptions = {
-  clearCache: boolean
+interface DeployOptions {
+  /** Clear build cache. */
+  clearCache?: boolean
+  /** Wait until the deployment status is successful. */
+  waitDeploy?: boolean
 }
 
-type RenderOptions = {
+interface RenderOptions {
+  /** Render API Key. */
   apiKey: string
+  /** Render Service ID. */
   serviceId: string
+}
+
+export const RenderErrorResponse = {
+  400: 'The request could not be understood by the server.',
+  401: 'Authorization information is missing or invalid.',
+  403: 'You do not have permissions for the requested resource.',
+  404: 'Unable to find the requested resource.',
+  406: 'Unable to generate preferred media types as specified by Accept request header.',
+  410: 'The requested resource is no longer available.',
+  429: 'Rate limit has been surpassed.',
+  500: 'An unexpected server error has occurred.',
+  503: 'Server currently unavailable.'
 }
