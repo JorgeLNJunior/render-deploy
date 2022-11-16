@@ -13,7 +13,7 @@ inputs:
     default: false
     description: 'Clear build cache'
 runs:
-  using: 'node18'
+  using: 'node16'
   main: 'dist/index.js'
 branding:
   icon: 'upload-cloud'
