@@ -104,7 +104,7 @@ describe('deploy', () => {
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(coreSpy).toHaveBeenCalledWith(
-        `The deploy exited with status: ${RenderDeployStatus.BUILD_FAILED}`
+        `The deploy exited with status: ${RenderDeployStatus.BUILD_FAILED}.`
       )
     })
 
@@ -123,7 +123,7 @@ describe('deploy', () => {
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(coreSpy).toHaveBeenCalledWith(
-        `The deploy exited with status: ${RenderDeployStatus.CANCELED}`
+        `The deploy exited with status: ${RenderDeployStatus.CANCELED}.`
       )
     })
 
@@ -142,7 +142,7 @@ describe('deploy', () => {
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(coreSpy).toHaveBeenCalledWith(
-        `The deploy exited with status: ${RenderDeployStatus.DEACTIVATED}`
+        `The deploy exited with status: ${RenderDeployStatus.DEACTIVATED}.`
       )
     })
 
@@ -161,7 +161,7 @@ describe('deploy', () => {
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(coreSpy).toHaveBeenCalledWith(
-        `The deploy exited with status: ${RenderDeployStatus.UPLOAD_FAILED}`
+        `The deploy exited with status: ${RenderDeployStatus.UPLOAD_FAILED}.`
       )
     })
   })
