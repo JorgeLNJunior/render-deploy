@@ -57,13 +57,13 @@ class Action {
                 if (waitDeploy) {
                     let waitStatus = true;
                     let deployState = render_service_1.RenderDeployStatus.CREATED;
-                    core.info('Waiting fot deploy successful status.');
+                    core.info('Waiting for deploy successful status.');
                     while (waitStatus) {
                         yield (0, wait_helper_1.wait)(10);
                         const status = yield renderService.verifyDeployStatus(deployId);
                         if (status === render_service_1.RenderDeployStatus.LIVE) {
                             waitStatus = false;
-                            return;
+                            return core.info(`The service has been deployed.`);
                         }
                         if (status === render_service_1.RenderDeployStatus.BUILD_FAILED ||
                             status === render_service_1.RenderDeployStatus.CANCELED ||
