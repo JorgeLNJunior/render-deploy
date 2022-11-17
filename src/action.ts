@@ -31,7 +31,7 @@ export default class Action {
 
           if (status === RenderDeployStatus.LIVE) {
             waitStatus = false
-            return
+            return core.info(`The service has been deployed.`)
           }
 
           if (
