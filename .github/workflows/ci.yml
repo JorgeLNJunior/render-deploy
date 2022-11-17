@@ -39,8 +39,7 @@ jobs:
 
   package:
     runs-on: ubuntu-latest
-    needs: [build, test]
-    if: github.ref == 'refs/heads/main'
+    needs: [build]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 18.x
