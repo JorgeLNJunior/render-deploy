@@ -23,7 +23,7 @@ export default class Action {
         let waitStatus = true
         let deployState = RenderDeployStatus.CREATED
 
-        core.info('Waiting fot deploy successful status.')
+        core.info('Waiting for deploy successful status.')
 
         while (waitStatus) {
           await wait(10)
