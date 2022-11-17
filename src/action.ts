@@ -21,12 +21,18 @@ export default class Action {
 
       if (waitDeploy) {
         let waitStatus = true
+        let deployState = RenderDeployStatus.CREATED
 
-        core.info('Waiting deploy successful status')
+        core.info('Waiting fot deploy successful status.')
 
         while (waitStatus) {
           await wait(10)
           const status = await renderService.verifyDeployStatus(deployId)
+
+          if (status === RenderDeployStatus.LIVE) {
+            waitStatus = false
+            return
+          }
 
           if (
             status === RenderDeployStatus.BUILD_FAILED ||
@@ -34,12 +40,13 @@ export default class Action {
             status === RenderDeployStatus.DEACTIVATED ||
             status === RenderDeployStatus.UPLOAD_FAILED
           ) {
-            return core.setFailed(`The deploy exited with status: ${status}`)
+            return core.setFailed(`The deploy exited with status: ${status}.`)
           }
 
-          if (status === RenderDeployStatus.LIVE) waitStatus = false
-
-          core.info(`Deploy status: ${status}`)
+          if (status !== deployState) {
+            core.info(`Deploy status: ${status}.`)
+            deployState = status
+          }
         }
       }
     } catch (error) {
