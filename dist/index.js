@@ -41,6 +41,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const axios_1 = __nccwpck_require__(8757);
+const wait_helper_1 = __nccwpck_require__(7483);
 const render_service_1 = __nccwpck_require__(6484);
 class Action {
     run() {
@@ -50,22 +51,38 @@ class Action {
                 const serviceId = core.getInput('service_id', { required: true });
                 const apiKey = core.getInput('api_key', { required: true });
                 const clearCache = core.getBooleanInput('clear_cache');
-                yield new render_service_1.RenderService({ apiKey, serviceId }).triggerDeploy({ clearCache });
+                const waitDeploy = core.getBooleanInput('wait_deploy');
+                const renderService = new render_service_1.RenderService({ apiKey, serviceId });
+                const deployId = yield renderService.triggerDeploy({ clearCache });
+                if (waitDeploy) {
+                    let waitStatus = true;
+                    let deployState = render_service_1.RenderDeployStatus.CREATED;
+                    core.info('Waiting for deploy successful status.');
+                    while (waitStatus) {
+                        yield (0, wait_helper_1.wait)(10);
+                        const status = yield renderService.verifyDeployStatus(deployId);
+                        if (status === render_service_1.RenderDeployStatus.LIVE) {
+                            waitStatus = false;
+                            return core.info(`The service has been deployed.`);
+                        }
+                        if (status === render_service_1.RenderDeployStatus.BUILD_FAILED ||
+                            status === render_service_1.RenderDeployStatus.CANCELED ||
+                            status === render_service_1.RenderDeployStatus.DEACTIVATED ||
+                            status === render_service_1.RenderDeployStatus.UPLOAD_FAILED) {
+                            return core.setFailed(`The deploy exited with status: ${status}.`);
+                        }
+                        if (status !== deployState) {
+                            core.info(`Deploy status: ${status}.`);
+                            deployState = status;
+                        }
+                    }
+                }
             }
             catch (error) {
-                if (error instanceof axios_1.AxiosError) {
-                    switch ((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) {
-                        case 401:
-                            return core.setFailed('invalid api key');
-                        case 404:
-                            return core.setFailed('invalid service id');
-                        case 429:
-                            return core.setFailed('too many requests');
-                        case 500:
-                            return core.setFailed('render api error');
-                        case 503:
-                            return core.setFailed('render api unavailable');
-                    }
+                if (error instanceof axios_1.AxiosError && ((_a = error.response) === null || _a === void 0 ? void 0 : _a.status)) {
+                    const status = error.response.status;
+                    return core.setFailed(render_service_1.RenderErrorResponse[status] ||
+                        'Unexpected error');
                 }
                 if (error instanceof Error)
                     return core.setFailed(error.message);
@@ -74,6 +91,32 @@ class Action {
     }
 }
 exports["default"] = Action;
+
+
+/***/ }),
+
+/***/ 7483:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.wait = void 0;
+function wait(seconds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+    });
+}
+exports.wait = wait;
 
 
 /***/ }),
@@ -111,7 +154,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RenderService = void 0;
+exports.RenderErrorResponse = exports.RenderDeployStatus = exports.RenderService = void 0;
 const axios_1 = __importDefault(__nccwpck_require__(8757));
 class RenderService {
     constructor(options) {
@@ -122,15 +165,54 @@ class RenderService {
             }
         });
     }
+    /**
+     * Given a deploy id, returns the deploy status.
+     * @param deployId The id of the deploy.
+     * @returns A `RenderDeployStatus`.
+     */
+    verifyDeployStatus(deployId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.client.get(`/deploys/${deployId}`);
+            return response.data.status;
+        });
+    }
+    /**
+     * Trigger a new deploy.
+     * @param options Deploy options.
+     * @returns The id of the deploy
+     */
     triggerDeploy(options) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.client.post('/deploys', {
+            const response = yield this.client.post('/deploys', {
                 clearCache: options.clearCache ? 'clear' : 'do_not_clear'
             });
+            return response.data.id;
         });
     }
 }
 exports.RenderService = RenderService;
+var RenderDeployStatus;
+(function (RenderDeployStatus) {
+    RenderDeployStatus["CREATED"] = "created";
+    RenderDeployStatus["BUILD_IN_PROGRESS"] = "build_in_progress";
+    RenderDeployStatus["UPDATE_IN_PROGRESS"] = "update_in_progress";
+    RenderDeployStatus["LIVE"] = "live";
+    RenderDeployStatus["DEACTIVATED"] = "deactivated";
+    RenderDeployStatus["BUILD_FAILED"] = "build_failed";
+    RenderDeployStatus["UPLOAD_FAILED"] = "update_failed";
+    RenderDeployStatus["CANCELED"] = "canceled";
+})(RenderDeployStatus = exports.RenderDeployStatus || (exports.RenderDeployStatus = {}));
+exports.RenderErrorResponse = {
+    400: 'The request could not be understood by the server.',
+    401: 'Authorization information is missing or invalid.',
+    403: 'You do not have permissions for the requested resource.',
+    404: 'Unable to find the requested resource.',
+    406: 'Unable to generate preferred media types as specified by Accept request header.',
+    410: 'The requested resource is no longer available.',
+    429: 'Rate limit has been surpassed.',
+    500: 'An unexpected server error has occurred.',
+    503: 'Server currently unavailable.'
+};
 
 
 /***/ }),

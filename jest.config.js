@@ -6,5 +6,6 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest'
   },
   verbose: true,
-  collectCoverageFrom: ['src/**/*.(t|j)s', '!src/main.ts']
+  collectCoverageFrom: ['src/**/*.(t|j)s', '!src/main.ts'],
+  testTimeout: 15000
 }

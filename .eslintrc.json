@@ -16,6 +16,7 @@
       "import/no-namespace": "off",
       "import/named": "off",
       "no-unused-vars": "off",
+      "no-shadow": "off",
       "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/explicit-member-accessibility": ["error", {"accessibility": "no-public"}],
       "@typescript-eslint/no-require-imports": "error",

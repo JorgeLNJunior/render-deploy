@@ -28,11 +28,12 @@
 ```yml
 steps:
     - uses: actions/checkout@v3
-    - uses: JorgeLNJunior/render-deploy@v1.2.2
+    - uses: JorgeLNJunior/render-deploy@v1.3.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }} # required
         api_key: ${{ secrets.RENDER_API_KEY }} # required
-        clear_cache: false # optional
+        clear_cache: false # Clear build cache. Optional
+        wait_deploy: false # Wait until the deploy status is successful. Warning! Free Render services can take +10 minutes to be fully deployed. Optional
 ```
 
 ## Licence
