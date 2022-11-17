@@ -56,19 +56,25 @@ class Action {
                 const deployId = yield renderService.triggerDeploy({ clearCache });
                 if (waitDeploy) {
                     let waitStatus = true;
-                    core.info('Waiting deploy successful status');
+                    let deployState = render_service_1.RenderDeployStatus.CREATED;
+                    core.info('Waiting fot deploy successful status.');
                     while (waitStatus) {
                         yield (0, wait_helper_1.wait)(10);
                         const status = yield renderService.verifyDeployStatus(deployId);
+                        if (status === render_service_1.RenderDeployStatus.LIVE) {
+                            waitStatus = false;
+                            return;
+                        }
                         if (status === render_service_1.RenderDeployStatus.BUILD_FAILED ||
                             status === render_service_1.RenderDeployStatus.CANCELED ||
                             status === render_service_1.RenderDeployStatus.DEACTIVATED ||
                             status === render_service_1.RenderDeployStatus.UPLOAD_FAILED) {
-                            return core.setFailed(`The deploy exited with status: ${status}`);
+                            return core.setFailed(`The deploy exited with status: ${status}.`);
                         }
-                        if (status === render_service_1.RenderDeployStatus.LIVE)
-                            waitStatus = false;
-                        core.info(`Deploy status: ${status}`);
+                        if (status !== deployState) {
+                            core.info(`Deploy status: ${status}.`);
+                            deployState = status;
+                        }
                     }
                 }
             }
