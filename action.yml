@@ -12,6 +12,10 @@ inputs:
     required: false
     default: false
     description: 'Clear build cache'
+  wait_deploy:
+    required: false
+    default: false
+    description: 'Wait until the deploy status is successful'
 runs:
   using: 'node16'
   main: 'dist/index.js'

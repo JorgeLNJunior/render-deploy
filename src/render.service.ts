@@ -12,18 +12,32 @@ export class RenderService {
     })
   }
 
-  async triggerDeploy(options: DeployOptions): Promise<void> {
-    await this.client.post('/deploys', {
+  /**
+   * Given a deploy id, returns the deploy status.
+   * @param deployId The id of the deploy.
+   * @returns A `RenderDeployStatus`.
+   */
+  async verifyDeployStatus(deployId: string): Promise<RenderDeployStatus> {
+    const response = await this.client.get(`/deploys/${deployId}`)
+    return response.data.status as RenderDeployStatus
+  }
+
+  /**
+   * Trigger a new deploy.
+   * @param options Deploy options.
+   * @returns The id of the deploy
+   */
+  async triggerDeploy(options: DeployOptions): Promise<string> {
+    const response = await this.client.post('/deploys', {
       clearCache: options.clearCache ? 'clear' : 'do_not_clear'
     })
+    return response.data.id as string
   }
 }
 
 interface DeployOptions {
   /** Clear build cache. */
   clearCache?: boolean
-  /** Wait until the deployment status is successful. */
-  waitDeploy?: boolean
 }
 
 interface RenderOptions {
@@ -31,6 +45,17 @@ interface RenderOptions {
   apiKey: string
   /** Render Service ID. */
   serviceId: string
+}
+
+export enum RenderDeployStatus {
+  CREATED = 'created',
+  BUILD_IN_PROGRESS = 'build_in_progress',
+  UPDATE_IN_PROGRESS = 'update_in_progress',
+  LIVE = 'live',
+  DEACTIVATED = 'deactivated',
+  BUILD_FAILED = 'build_failed',
+  UPLOAD_FAILED = 'update_failed',
+  CANCELED = 'canceled'
 }
 
 export const RenderErrorResponse = {

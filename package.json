@@ -36,6 +36,7 @@
     "@commitlint/cli": "^17.2.0",
     "@commitlint/config-conventional": "^17.2.0",
     "@release-it/conventional-changelog": "^5.1.1",
+    "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",
     "@typescript-eslint/parser": "^5.42.1",
     "@vercel/ncc": "^0.34.0",
