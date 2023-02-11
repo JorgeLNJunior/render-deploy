@@ -1,5 +1,5 @@
-name: 'Deploy to Render'
-description: 'Trigger a Render service deploy'
+name: 'Render Deploy'
+description: 'Deploy your Render app through GitHub Actions'
 author: 'JorgeLNJunior'
 inputs:
   service_id:
@@ -10,11 +10,11 @@ inputs:
     description: 'Render api key'
   clear_cache:
     required: false
-    default: false
+    default: "false"
     description: 'Clear build cache'
   wait_deploy:
     required: false
-    default: false
+    default: "false"
     description: 'Wait until the deploy status is successful'
 runs:
   using: 'node16'
