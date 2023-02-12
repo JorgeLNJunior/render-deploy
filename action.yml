@@ -1,4 +1,4 @@
-name: 'Render Deploy'
+name: 'Deploy to Render'
 description: 'Deploy your Render app through GitHub Actions'
 author: 'JorgeLNJunior'
 inputs:
