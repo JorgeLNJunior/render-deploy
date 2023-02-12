@@ -28,7 +28,7 @@
 ```yml
 steps:
     - uses: actions/checkout@v3
-    - uses: JorgeLNJunior/render-deploy@v1.3.1
+    - uses: JorgeLNJunior/render-deploy@v1.3.2
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }} # required
         api_key: ${{ secrets.RENDER_API_KEY }} # required
