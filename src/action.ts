@@ -21,11 +21,18 @@ export default class Action {
 
       if (waitDeploy) {
         let waitStatus = true
-        let deployState = RenderDeployStatus.CREATED
+        let currentDeployStatus = RenderDeployStatus.CREATED
 
         core.info('Waiting for deploy successful status.')
 
         while (waitStatus) {
+          const failedStatuses = [
+            RenderDeployStatus.BUILD_FAILED,
+            RenderDeployStatus.CANCELED,
+            RenderDeployStatus.DEACTIVATED,
+            RenderDeployStatus.UPLOAD_FAILED
+          ]
+
           await wait(10)
           const status = await renderService.verifyDeployStatus(deployId)
 
@@ -34,18 +41,13 @@ export default class Action {
             return core.info(`The service has been deployed.`)
           }
 
-          if (
-            status === RenderDeployStatus.BUILD_FAILED ||
-            status === RenderDeployStatus.CANCELED ||
-            status === RenderDeployStatus.DEACTIVATED ||
-            status === RenderDeployStatus.UPLOAD_FAILED
-          ) {
+          if (failedStatuses.includes(status)) {
             return core.setFailed(`The deploy exited with status: ${status}.`)
           }
 
-          if (status !== deployState) {
+          if (status !== currentDeployStatus) {
             core.info(`Deploy status: ${status}.`)
-            deployState = status
+            currentDeployStatus = status
           }
         }
       }
