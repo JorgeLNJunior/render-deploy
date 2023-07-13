@@ -30,6 +30,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.0",
+    "@octokit/request": "^8.1.0",
     "axios": "^1.4.0"
   },
   "devDependencies": {
