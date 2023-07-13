@@ -10,12 +10,16 @@ inputs:
     description: 'Render api key'
   clear_cache:
     required: false
-    default: "false"
+    default: 'false'
     description: 'Clear build cache'
   wait_deploy:
     required: false
-    default: "false"
+    default: 'false'
     description: 'Wait until the deploy status is successful'
+  github_deployment:
+    required: false
+    description: 'Creates a github deployment'
+    default: 'false'
   github_token:
     required: true
     description: 'Github auth token'

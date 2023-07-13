@@ -17,7 +17,8 @@ export default class Action {
       const clearCache = core.getBooleanInput('clear_cache')
       const waitDeploy = core.getBooleanInput('wait_deploy')
 
-      const githubToken = core.getInput('github_token', {required: true})
+      const createGithubDeployment = core.getBooleanInput('github_deployment')
+      const githubToken = core.getInput('github_token')
       const environment = core.getInput('deployment_environment')
 
       const [owner, repo] = (process.env.GITHUB_REPOSITORY as string).split('/')
@@ -27,7 +28,9 @@ export default class Action {
       const githubService = new GitHubService({githubToken, owner, repo})
 
       const deployId = await renderService.triggerDeploy({clearCache})
-      await githubService.createDeployment(ref, environment)
+      if (createGithubDeployment) {
+        await githubService.createDeployment(ref, environment)
+      }
 
       if (waitDeploy) {
         let waitStatus = true
