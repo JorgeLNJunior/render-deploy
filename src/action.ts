@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {AxiosError} from 'axios'
 
-import {wait} from './helpers/wait.helper'
+import {Seconds, wait} from './helpers/wait.helper'
 import {
   RenderDeployStatus,
   RenderErrorResponse,
@@ -33,7 +33,7 @@ export default class Action {
             RenderDeployStatus.UPLOAD_FAILED
           ]
 
-          await wait(10)
+          await wait(Seconds.TEN)
           const status = await renderService.verifyDeployStatus(deployId)
 
           if (status === RenderDeployStatus.LIVE) {
