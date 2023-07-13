@@ -53,15 +53,17 @@ class Action {
                 const apiKey = core.getInput('api_key', { required: true });
                 const clearCache = core.getBooleanInput('clear_cache');
                 const waitDeploy = core.getBooleanInput('wait_deploy');
-                const githubToken = core.getInput('github_token', { required: true });
+                const createGithubDeployment = core.getBooleanInput('github_deployment');
+                const githubToken = core.getInput('github_token');
                 const environment = core.getInput('deployment_environment');
                 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
                 const ref = process.env.GITHUB_REF;
-                const actor = process.env.GITHUB_ACTOR;
                 const renderService = new render_service_1.RenderService({ apiKey, serviceId });
                 const githubService = new github_service_1.GitHubService({ githubToken, owner, repo });
                 const deployId = yield renderService.triggerDeploy({ clearCache });
-                yield githubService.createDeployment(ref, actor, environment);
+                if (createGithubDeployment) {
+                    yield githubService.createDeployment(ref, environment);
+                }
                 if (waitDeploy) {
                     let waitStatus = true;
                     let currentDeployStatus = render_service_1.RenderDeployStatus.CREATED;
@@ -127,7 +129,7 @@ class GitHubService {
     constructor(config) {
         this.config = config;
     }
-    createDeployment(ref, actor, environment) {
+    createDeployment(ref, environment) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield (0, request_1.request)('POST /repos/{owner}/{repo}/deployments', {
                 owner: this.config.owner,
@@ -135,7 +137,6 @@ class GitHubService {
                 headers: {
                     authorization: `Bearer ${this.config.githubToken}`
                 },
-                description: `Deploy requested by ${actor}`,
                 production_environment: true,
                 environment,
                 ref
