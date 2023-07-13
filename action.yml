@@ -16,6 +16,13 @@ inputs:
     required: false
     default: "false"
     description: 'Wait until the deploy status is successful'
+  github_token:
+    required: true
+    description: 'Github auth token'
+  deployment_environment:
+    required: false
+    description: 'The name of the enviroment'
+    default: 'production'
 runs:
   using: 'node16'
   main: 'dist/index.js'
