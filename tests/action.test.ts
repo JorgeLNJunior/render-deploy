@@ -316,15 +316,13 @@ describe('Render error handling', () => {
 })
 
 describe('GitHub deployment', () => {
-  afterEach(() => jest.clearAllMocks())
-
   test('should be optional', async () => {
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
-    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
     process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
     jest
       .spyOn(RenderService.prototype, 'triggerDeploy')
@@ -333,6 +331,6 @@ describe('GitHub deployment', () => {
 
     await new Action().run()
 
-    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledTimes(0)
   })
 })
