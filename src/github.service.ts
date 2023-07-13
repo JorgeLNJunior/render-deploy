@@ -7,18 +7,13 @@ export class GitHubService {
     this.config = config
   }
 
-  async createDeployment(
-    ref: string,
-    actor: string,
-    environment?: string
-  ): Promise<number> {
+  async createDeployment(ref: string, environment?: string): Promise<number> {
     const response = await request('POST /repos/{owner}/{repo}/deployments', {
       owner: this.config.owner,
       repo: this.config.repo,
       headers: {
         authorization: `Bearer ${this.config.githubToken}`
       },
-      description: `Deploy requested by ${actor}`,
       production_environment: true,
       environment,
       ref

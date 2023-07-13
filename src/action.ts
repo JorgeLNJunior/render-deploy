@@ -22,13 +22,12 @@ export default class Action {
 
       const [owner, repo] = (process.env.GITHUB_REPOSITORY as string).split('/')
       const ref = process.env.GITHUB_REF as string
-      const actor = process.env.GITHUB_ACTOR as string
 
       const renderService = new RenderService({apiKey, serviceId})
       const githubService = new GitHubService({githubToken, owner, repo})
 
       const deployId = await renderService.triggerDeploy({clearCache})
-      await githubService.createDeployment(ref, actor, environment)
+      await githubService.createDeployment(ref, environment)
 
       if (waitDeploy) {
         let waitStatus = true
