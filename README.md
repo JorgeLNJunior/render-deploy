@@ -34,6 +34,8 @@ steps:
         api_key: ${{ secrets.RENDER_API_KEY }} # required
         clear_cache: false # Clear build cache. Optional
         wait_deploy: false # Wait until the deploy status is successful. Warning! Free Render services can take +5 minutes to be fully deployed. Optional
+        github_token: ${{ secrets.GITHUB_TOKEN }} # Optional
+        deployment_environment: 'production' # Optional
 ```
 
 ## Licence
