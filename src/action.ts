@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {AxiosError} from 'axios'
 
+import {GitHubService} from './github.service'
 import {Seconds, wait} from './helpers/wait.helper'
 import {
   RenderDeployStatus,
@@ -15,9 +16,19 @@ export default class Action {
       const apiKey = core.getInput('api_key', {required: true})
       const clearCache = core.getBooleanInput('clear_cache')
       const waitDeploy = core.getBooleanInput('wait_deploy')
+
+      const githubToken = core.getInput('github_token', {required: true})
+      const environment = core.getInput('deployment_environment')
+
+      const [owner, repo] = (process.env.GITHUB_REPOSITORY as string).split('/')
+      const ref = process.env.GITHUB_REF as string
+      const actor = process.env.GITHUB_ACTOR as string
+
       const renderService = new RenderService({apiKey, serviceId})
+      const githubService = new GitHubService({githubToken, owner, repo})
 
       const deployId = await renderService.triggerDeploy({clearCache})
+      await githubService.createDeployment(ref, actor, environment)
 
       if (waitDeploy) {
         let waitStatus = true
