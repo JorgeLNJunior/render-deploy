@@ -26,7 +26,7 @@ export default class Action {
         core.info('Waiting for deploy successful status.')
 
         while (waitStatus) {
-          const failedStatuses = [
+          const failureStatuses = [
             RenderDeployStatus.BUILD_FAILED,
             RenderDeployStatus.CANCELED,
             RenderDeployStatus.DEACTIVATED,
@@ -41,7 +41,7 @@ export default class Action {
             return core.info(`The service has been deployed.`)
           }
 
-          if (failedStatuses.includes(status)) {
+          if (failureStatuses.includes(status)) {
             return core.setFailed(`The deploy exited with status: ${status}.`)
           }
 
