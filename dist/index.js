@@ -61,8 +61,12 @@ class Action {
                 const renderService = new render_service_1.RenderService({ apiKey, serviceId });
                 const githubService = new github_service_1.GitHubService({ githubToken, owner, repo });
                 const deployId = yield renderService.triggerDeploy({ clearCache });
+                let serviceUrl = '';
+                let deploymentId = 0;
                 if (createGithubDeployment) {
-                    yield githubService.createDeployment(ref, environment);
+                    deploymentId = yield githubService.createDeployment(ref, environment);
+                    serviceUrl = yield renderService.getServiceUrl();
+                    yield githubService.createDeploymentStatus(deploymentId, serviceUrl, waitDeploy ? github_service_1.DeploymentState.IN_PROGRESS : github_service_1.DeploymentState.SUCCESS);
                 }
                 if (waitDeploy) {
                     let waitStatus = true;
@@ -78,10 +82,16 @@ class Action {
                         yield (0, wait_helper_1.wait)(wait_helper_1.Seconds.TEN);
                         const status = yield renderService.verifyDeployStatus(deployId);
                         if (status === render_service_1.RenderDeployStatus.LIVE) {
+                            if (createGithubDeployment) {
+                                yield githubService.createDeploymentStatus(deploymentId, serviceUrl, github_service_1.DeploymentState.SUCCESS);
+                            }
                             waitStatus = false;
                             return core.info(`The service has been deployed.`);
                         }
                         if (failureStatuses.includes(status)) {
+                            if (createGithubDeployment) {
+                                yield githubService.createDeploymentStatus(deploymentId, serviceUrl, github_service_1.DeploymentState.FAILURE);
+                            }
                             return core.setFailed(`The deploy exited with status: ${status}.`);
                         }
                         if (status !== currentDeployStatus) {
@@ -123,7 +133,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GitHubService = void 0;
+exports.DeploymentState = exports.GitHubService = void 0;
 const request_1 = __nccwpck_require__(6234);
 class GitHubService {
     constructor(config) {
@@ -146,8 +156,25 @@ class GitHubService {
             throw new Error(`github api error: ${response.data.message}`);
         });
     }
+    createDeploymentStatus(deploymentID, deploymentURL, state) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield (0, request_1.request)('POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses', {
+                owner: this.config.owner,
+                repo: this.config.repo,
+                deployment_id: deploymentID,
+                log_url: deploymentURL,
+                state
+            });
+        });
+    }
 }
 exports.GitHubService = GitHubService;
+var DeploymentState;
+(function (DeploymentState) {
+    DeploymentState["IN_PROGRESS"] = "in_progress";
+    DeploymentState["SUCCESS"] = "success";
+    DeploymentState["FAILURE"] = "failure";
+})(DeploymentState || (exports.DeploymentState = DeploymentState = {}));
 
 
 /***/ }),
@@ -254,6 +281,12 @@ class RenderService {
                 clearCache: options.clearCache ? 'clear' : 'do_not_clear'
             });
             return response.data.id;
+        });
+    }
+    getServiceUrl() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.client.get('');
+            return response.data.url;
         });
     }
 }
