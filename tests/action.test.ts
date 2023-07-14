@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {describe, expect, jest, test} from '@jest/globals'
 
 import Action from '../src/action'
-import {GitHubService} from '../src/github.service'
+import {DeploymentState, GitHubService} from '../src/github.service'
 import {
   RenderDeployStatus,
   RenderErrorResponse,
@@ -317,20 +317,188 @@ describe('Render error handling', () => {
 
 describe('GitHub deployment', () => {
   test('should be optional', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
     jest
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
-    const spy = jest.spyOn(GitHubService.prototype, 'createDeployment')
+    const spy = jest
+      .spyOn(GitHubService.prototype, 'createDeployment')
+      .mockResolvedValueOnce(1)
 
     await new Action().run()
 
     expect(spy).toHaveBeenCalledTimes(0)
+  })
+
+  test('should create a deployment', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
+    process.env['INPUT_SERVICE_ID'] = 'my service id'
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = 'false'
+    process.env['INPUT_WAIT_DEPLOY'] = 'false'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
+
+    jest
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockResolvedValueOnce('id')
+    jest
+      .spyOn(RenderService.prototype, 'getServiceUrl')
+      .mockResolvedValueOnce('url')
+    const spy = jest
+      .spyOn(GitHubService.prototype, 'createDeployment')
+      .mockResolvedValueOnce(1)
+
+    await new Action().run()
+
+    expect(spy).toHaveBeenCalledTimes(1)
+  })
+
+  describe('Deployment status', () => {
+    test('should create a deployment with success state if it does not have to wait', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
+      process.env['INPUT_SERVICE_ID'] = 'my service id'
+      process.env['INPUT_API_KEY'] = 'my api key'
+      process.env['INPUT_CLEAR_CACHE'] = 'false'
+      process.env['INPUT_WAIT_DEPLOY'] = 'false'
+      process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
+
+      const deploymentID = 1
+      const state = DeploymentState.SUCCESS
+      const serviceURL = 'https://my-service.onrender.com'
+
+      jest
+        .spyOn(RenderService.prototype, 'triggerDeploy')
+        .mockResolvedValueOnce('id')
+      jest
+        .spyOn(RenderService.prototype, 'getServiceUrl')
+        .mockResolvedValueOnce(serviceURL)
+      jest
+        .spyOn(GitHubService.prototype, 'createDeployment')
+        .mockResolvedValueOnce(deploymentID)
+      const spy = jest
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus')
+        .mockResolvedValueOnce()
+
+      await new Action().run()
+
+      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+    })
+
+    test('should create a deployment with in progress state if it does have to wait', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
+      process.env['INPUT_SERVICE_ID'] = 'my service id'
+      process.env['INPUT_API_KEY'] = 'my api key'
+      process.env['INPUT_CLEAR_CACHE'] = 'false'
+      process.env['INPUT_WAIT_DEPLOY'] = 'true'
+      process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
+
+      const deploymentID = 1
+      const state = DeploymentState.IN_PROGRESS
+      const serviceURL = 'https://my-service.onrender.com'
+
+      jest
+        .spyOn(RenderService.prototype, 'triggerDeploy')
+        .mockResolvedValueOnce('id')
+      jest
+        .spyOn(RenderService.prototype, 'getServiceUrl')
+        .mockResolvedValueOnce(serviceURL)
+      jest
+        .spyOn(RenderService.prototype, 'verifyDeployStatus')
+        .mockResolvedValueOnce(RenderDeployStatus.LIVE)
+      jest
+        .spyOn(GitHubService.prototype, 'createDeployment')
+        .mockResolvedValueOnce(deploymentID)
+      const spy = jest
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus')
+        .mockResolvedValueOnce()
+
+      await new Action().run()
+
+      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+    })
+
+    test('should create a deployment with success state if the deploy status is live', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
+      process.env['INPUT_SERVICE_ID'] = 'my service id'
+      process.env['INPUT_API_KEY'] = 'my api key'
+      process.env['INPUT_CLEAR_CACHE'] = 'false'
+      process.env['INPUT_WAIT_DEPLOY'] = 'true'
+      process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
+
+      const deploymentID = 1
+      const state = DeploymentState.SUCCESS
+      const serviceURL = 'https://my-service.onrender.com'
+
+      jest
+        .spyOn(RenderService.prototype, 'triggerDeploy')
+        .mockResolvedValueOnce('id')
+      jest
+        .spyOn(RenderService.prototype, 'getServiceUrl')
+        .mockResolvedValueOnce(serviceURL)
+      jest
+        .spyOn(RenderService.prototype, 'verifyDeployStatus')
+        .mockResolvedValueOnce(RenderDeployStatus.LIVE)
+      jest
+        .spyOn(GitHubService.prototype, 'createDeployment')
+        .mockResolvedValueOnce(deploymentID)
+      jest
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus') // in progress call
+        .mockResolvedValueOnce()
+      const spy = jest
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus') // live deploy call
+        .mockResolvedValueOnce()
+
+      await new Action().run()
+
+      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+    })
+
+    test('should create a deployment with failure state if the deploy status is failure', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
+      process.env['INPUT_SERVICE_ID'] = 'my service id'
+      process.env['INPUT_API_KEY'] = 'my api key'
+      process.env['INPUT_CLEAR_CACHE'] = 'false'
+      process.env['INPUT_WAIT_DEPLOY'] = 'true'
+      process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
+
+      const deploymentID = 1
+      const state = DeploymentState.FAILURE
+      const serviceURL = 'https://my-service.onrender.com'
+
+      jest
+        .spyOn(RenderService.prototype, 'triggerDeploy')
+        .mockResolvedValueOnce('id')
+      jest
+        .spyOn(RenderService.prototype, 'getServiceUrl')
+        .mockResolvedValueOnce(serviceURL)
+      jest
+        .spyOn(RenderService.prototype, 'verifyDeployStatus')
+        .mockResolvedValueOnce(RenderDeployStatus.BUILD_FAILED)
+      jest
+        .spyOn(GitHubService.prototype, 'createDeployment')
+        .mockResolvedValueOnce(deploymentID)
+      jest
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus') // in progress call
+        .mockResolvedValueOnce()
+      const spy = jest
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus') // live deploy call
+        .mockResolvedValueOnce()
+
+      await new Action().run()
+
+      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+    })
   })
 })

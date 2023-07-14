@@ -33,6 +33,11 @@ export class RenderService {
     })
     return response.data.id as string
   }
+
+  async getServiceUrl(): Promise<string> {
+    const response = await this.client.get('')
+    return response.data.url as string
+  }
 }
 
 interface DeployOptions {

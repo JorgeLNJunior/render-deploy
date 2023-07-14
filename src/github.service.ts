@@ -21,6 +21,29 @@ export class GitHubService {
     if (response.status === 201) return response.data.id
     throw new Error(`github api error: ${response.data.message}`)
   }
+
+  async createDeploymentStatus(
+    deploymentID: number,
+    deploymentURL: string,
+    state: DeploymentState
+  ): Promise<void> {
+    await request(
+      'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
+      {
+        owner: this.config.owner,
+        repo: this.config.repo,
+        deployment_id: deploymentID,
+        log_url: deploymentURL,
+        state
+      }
+    )
+  }
+}
+
+export enum DeploymentState {
+  IN_PROGRESS = 'in_progress',
+  SUCCESS = 'success',
+  FAILURE = 'failure'
 }
 
 interface GitHubConfig {

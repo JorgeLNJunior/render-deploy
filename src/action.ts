@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {AxiosError} from 'axios'
 
-import {GitHubService} from './github.service'
+import {DeploymentState, GitHubService} from './github.service'
 import {Seconds, wait} from './helpers/wait.helper'
 import {
   RenderDeployStatus,
@@ -28,8 +28,17 @@ export default class Action {
       const githubService = new GitHubService({githubToken, owner, repo})
 
       const deployId = await renderService.triggerDeploy({clearCache})
+      let serviceUrl = ''
+      let deploymentId = 0
+
       if (createGithubDeployment) {
-        await githubService.createDeployment(ref, environment)
+        deploymentId = await githubService.createDeployment(ref, environment)
+        serviceUrl = await renderService.getServiceUrl()
+        await githubService.createDeploymentStatus(
+          deploymentId,
+          serviceUrl,
+          waitDeploy ? DeploymentState.IN_PROGRESS : DeploymentState.SUCCESS
+        )
       }
 
       if (waitDeploy) {
@@ -50,11 +59,25 @@ export default class Action {
           const status = await renderService.verifyDeployStatus(deployId)
 
           if (status === RenderDeployStatus.LIVE) {
+            if (createGithubDeployment) {
+              await githubService.createDeploymentStatus(
+                deploymentId,
+                serviceUrl,
+                DeploymentState.SUCCESS
+              )
+            }
             waitStatus = false
             return core.info(`The service has been deployed.`)
           }
 
           if (failureStatuses.includes(status)) {
+            if (createGithubDeployment) {
+              await githubService.createDeploymentStatus(
+                deploymentId,
+                serviceUrl,
+                DeploymentState.FAILURE
+              )
+            }
             return core.setFailed(`The deploy exited with status: ${status}.`)
           }
 
