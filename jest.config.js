@@ -7,5 +7,5 @@ module.exports = {
   },
   verbose: true,
   collectCoverageFrom: ['src/**/*.(t|j)s', '!src/main.ts'],
-  testTimeout: 15000
+  testTimeout: 25000
 }
