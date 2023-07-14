@@ -10,7 +10,7 @@ import {
 } from '../src/render.service'
 import {getAxiosError} from './helpers/axios.helper'
 
-describe('inputs', () => {
+describe('Inputs', () => {
   test('should throw an error if the input "service_id" is missing', async () => {
     const coreSpy = jest.spyOn(core, 'setFailed')
 
@@ -56,14 +56,15 @@ describe('inputs', () => {
   })
 })
 
-describe('deploy', () => {
+describe('Deploy', () => {
   test('should trigger a deploy', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const spy = jest
       .spyOn(RenderService.prototype, 'triggerDeploy')
@@ -75,40 +76,69 @@ describe('deploy', () => {
   })
 
   test('should wait until the deploy is completed', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     jest
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
     const spy = jest
       .spyOn(RenderService.prototype, 'verifyDeployStatus')
-      .mockResolvedValue(RenderDeployStatus.LIVE)
+      .mockResolvedValueOnce(RenderDeployStatus.LIVE)
 
     await new Action().run()
 
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
-  describe('deploy error handling', () => {
+  test('should update the deploy status', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
+    process.env['INPUT_SERVICE_ID'] = 'my service id'
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = 'false'
+    process.env['INPUT_WAIT_DEPLOY'] = 'true'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
+
+    const status = RenderDeployStatus.BUILD_IN_PROGRESS
+
+    jest
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockResolvedValueOnce('id')
+    jest
+      .spyOn(RenderService.prototype, 'verifyDeployStatus')
+      .mockResolvedValueOnce(status) // first call
+    jest
+      .spyOn(RenderService.prototype, 'verifyDeployStatus')
+      .mockResolvedValueOnce(RenderDeployStatus.LIVE) // second call
+    const spy = jest.spyOn(core, 'info')
+
+    await new Action().run()
+
+    expect(spy).toHaveBeenCalledWith(`Deploy status: ${status}.`)
+  })
+
+  describe('Deploy error handling', () => {
     test('should exit if the deploy status is "build_failed"', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
       process.env['INPUT_SERVICE_ID'] = 'my service id'
       process.env['INPUT_API_KEY'] = 'my api key'
       process.env['INPUT_CLEAR_CACHE'] = 'false'
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-      process.env['GITHUB_REPOSITORY'] = 'action/test'
 
       jest
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
       const spy = jest
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
-        .mockResolvedValue(RenderDeployStatus.BUILD_FAILED)
+        .mockResolvedValueOnce(RenderDeployStatus.BUILD_FAILED)
       const coreSpy = jest.spyOn(core, 'setFailed')
 
       await new Action().run()
@@ -120,19 +150,20 @@ describe('deploy', () => {
     })
 
     test('should exit if the deploy status is "canceled"', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
       process.env['INPUT_SERVICE_ID'] = 'my service id'
       process.env['INPUT_API_KEY'] = 'my api key'
       process.env['INPUT_CLEAR_CACHE'] = 'false'
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-      process.env['GITHUB_REPOSITORY'] = 'action/test'
 
       jest
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
       const spy = jest
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
-        .mockResolvedValue(RenderDeployStatus.CANCELED)
+        .mockResolvedValueOnce(RenderDeployStatus.CANCELED)
       const coreSpy = jest.spyOn(core, 'setFailed')
 
       await new Action().run()
@@ -144,19 +175,20 @@ describe('deploy', () => {
     })
 
     test('should exit if the deploy status is "deactivated"', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
       process.env['INPUT_SERVICE_ID'] = 'my service id'
       process.env['INPUT_API_KEY'] = 'my api key'
       process.env['INPUT_CLEAR_CACHE'] = 'false'
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-      process.env['GITHUB_REPOSITORY'] = 'action/test'
 
       jest
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
       const spy = jest
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
-        .mockResolvedValue(RenderDeployStatus.DEACTIVATED)
+        .mockResolvedValueOnce(RenderDeployStatus.DEACTIVATED)
       const coreSpy = jest.spyOn(core, 'setFailed')
 
       await new Action().run()
@@ -168,19 +200,20 @@ describe('deploy', () => {
     })
 
     test('should exit if the deploy status is "update_failed"', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
       process.env['INPUT_SERVICE_ID'] = 'my service id'
       process.env['INPUT_API_KEY'] = 'my api key'
       process.env['INPUT_CLEAR_CACHE'] = 'false'
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-      process.env['GITHUB_REPOSITORY'] = 'action/test'
 
       jest
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
       const spy = jest
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
-        .mockResolvedValue(RenderDeployStatus.UPLOAD_FAILED)
+        .mockResolvedValueOnce(RenderDeployStatus.UPLOAD_FAILED)
       const coreSpy = jest.spyOn(core, 'setFailed')
 
       await new Action().run()
@@ -195,12 +228,13 @@ describe('deploy', () => {
 
 describe('Render error handling', () => {
   test('should exit if the server retuns 401', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const coreSpy = jest.spyOn(core, 'setFailed')
 
@@ -215,12 +249,13 @@ describe('Render error handling', () => {
   })
 
   test('should exit if the server retuns 404', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const coreSpy = jest.spyOn(core, 'setFailed')
 
@@ -235,12 +270,13 @@ describe('Render error handling', () => {
   })
 
   test('should exit if the server retuns 429', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const coreSpy = jest.spyOn(core, 'setFailed')
 
@@ -255,12 +291,13 @@ describe('Render error handling', () => {
   })
 
   test('should exit if the server retuns 500', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const coreSpy = jest.spyOn(core, 'setFailed')
 
@@ -275,12 +312,13 @@ describe('Render error handling', () => {
   })
 
   test('should exit if the server retuns 503', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const coreSpy = jest.spyOn(core, 'setFailed')
 
@@ -295,12 +333,13 @@ describe('Render error handling', () => {
   })
 
   test('should exit if the server retuns an unexpected message', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = 'false'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
-    process.env['GITHUB_REPOSITORY'] = 'action/test'
 
     const coreSpy = jest.spyOn(core, 'setFailed')
 
