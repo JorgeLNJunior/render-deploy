@@ -1,14 +1,11 @@
 import {request} from '@octokit/request'
-import fetch from 'node-fetch'
+import fetch from 'axios'
 
 export class GitHubService {
   private config: GitHubConfig
 
   constructor(config: GitHubConfig) {
     this.config = config
-    request.defaults({
-      request: {fetch}
-    })
   }
 
   async createDeployment(ref: string, environment?: string): Promise<number> {
@@ -20,7 +17,12 @@ export class GitHubService {
       },
       production_environment: true,
       environment,
-      ref
+      ref,
+      options: {
+        request: {
+          fetch
+        }
+      }
     })
     if (response.status === 201) return response.data.id
     throw new Error(`github api error: ${response.data.message}`)
@@ -38,7 +40,12 @@ export class GitHubService {
         repo: this.config.repo,
         deployment_id: deploymentID,
         log_url: deploymentURL,
-        state
+        state,
+        options: {
+          request: {
+            fetch
+          }
+        }
       }
     )
   }
