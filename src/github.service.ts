@@ -37,8 +37,9 @@ export class GitHubService {
       owner: this.config.owner,
       repo: this.config.repo,
       deployment_id: deploymentID,
-      log_url: deploymentURL,
       environment_url: deploymentURL,
+      log_url: deploymentURL,
+      target_url: deploymentURL,
       state
     })
   }
