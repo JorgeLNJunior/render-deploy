@@ -7,8 +7,9 @@ export class GitHubService {
   constructor(config: GitHubConfig) {
     this.config = config
     request.defaults({
-      request: {fetch: axios}
+      request: {fetch: axios.create()}
     })
+    request.endpoint.DEFAULTS.request?.fetch
   }
 
   async createDeployment(ref: string, environment?: string): Promise<number> {
