@@ -141,10 +141,12 @@ const request_1 = __nccwpck_require__(6234);
 const axios_1 = __importDefault(__nccwpck_require__(8757));
 class GitHubService {
     constructor(config) {
+        var _a;
         this.config = config;
         request_1.request.defaults({
-            request: { fetch: axios_1.default }
+            request: { fetch: axios_1.default.create() }
         });
+        (_a = request_1.request.endpoint.DEFAULTS.request) === null || _a === void 0 ? void 0 : _a.fetch;
     }
     createDeployment(ref, environment) {
         return __awaiter(this, void 0, void 0, function* () {
