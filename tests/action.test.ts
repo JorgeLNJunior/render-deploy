@@ -429,7 +429,7 @@ describe('GitHub deployment', () => {
 
       await new Action().run()
 
-      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+      expect(spy).toHaveBeenCalledWith(deploymentID, state, serviceURL)
     })
 
     test('should create a deployment with in progress state if it does have to wait', async () => {
@@ -463,7 +463,7 @@ describe('GitHub deployment', () => {
 
       await new Action().run()
 
-      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+      expect(spy).toHaveBeenNthCalledWith(1, deploymentID, state, undefined)
     })
 
     test('should create a deployment with success state if the deploy status is live', async () => {
@@ -500,7 +500,7 @@ describe('GitHub deployment', () => {
 
       await new Action().run()
 
-      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+      expect(spy).toHaveBeenCalledWith(deploymentID, state, serviceURL)
     })
 
     test('should create a deployment with failure state if the deploy status is failure', async () => {
@@ -537,7 +537,7 @@ describe('GitHub deployment', () => {
 
       await new Action().run()
 
-      expect(spy).toHaveBeenCalledWith(deploymentID, serviceURL, state)
+      expect(spy).toHaveBeenCalledWith(deploymentID, state)
     })
   })
 })

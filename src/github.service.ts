@@ -30,8 +30,8 @@ export class GitHubService {
 
   async createDeploymentStatus(
     deploymentID: number,
-    deploymentURL: string,
-    state: DeploymentState
+    state: DeploymentState,
+    deploymentURL?: string
   ): Promise<void> {
     await this.octo.rest.repos.createDeploymentStatus({
       owner: this.config.owner,

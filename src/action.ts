@@ -36,8 +36,8 @@ export default class Action {
         serviceUrl = await renderService.getServiceUrl()
         await githubService.createDeploymentStatus(
           deploymentId,
-          serviceUrl,
-          waitDeploy ? DeploymentState.IN_PROGRESS : DeploymentState.SUCCESS
+          waitDeploy ? DeploymentState.IN_PROGRESS : DeploymentState.SUCCESS,
+          waitDeploy ? undefined : serviceUrl
         )
       }
 
@@ -62,8 +62,8 @@ export default class Action {
             if (createGithubDeployment) {
               await githubService.createDeploymentStatus(
                 deploymentId,
-                serviceUrl,
-                DeploymentState.SUCCESS
+                DeploymentState.SUCCESS,
+                serviceUrl
               )
             }
             waitStatus = false
@@ -74,7 +74,6 @@ export default class Action {
             if (createGithubDeployment) {
               await githubService.createDeploymentStatus(
                 deploymentId,
-                serviceUrl,
                 DeploymentState.FAILURE
               )
             }
