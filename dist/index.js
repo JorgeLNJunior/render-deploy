@@ -66,7 +66,7 @@ class Action {
                 if (createGithubDeployment) {
                     deploymentId = yield githubService.createDeployment(ref, environment);
                     serviceUrl = yield renderService.getServiceUrl();
-                    yield githubService.createDeploymentStatus(deploymentId, serviceUrl, waitDeploy ? github_service_1.DeploymentState.IN_PROGRESS : github_service_1.DeploymentState.SUCCESS);
+                    yield githubService.createDeploymentStatus(deploymentId, waitDeploy ? github_service_1.DeploymentState.IN_PROGRESS : github_service_1.DeploymentState.SUCCESS, waitDeploy ? undefined : serviceUrl);
                 }
                 if (waitDeploy) {
                     let waitStatus = true;
@@ -83,14 +83,14 @@ class Action {
                         const status = yield renderService.verifyDeployStatus(deployId);
                         if (status === render_service_1.RenderDeployStatus.LIVE) {
                             if (createGithubDeployment) {
-                                yield githubService.createDeploymentStatus(deploymentId, serviceUrl, github_service_1.DeploymentState.SUCCESS);
+                                yield githubService.createDeploymentStatus(deploymentId, github_service_1.DeploymentState.SUCCESS, serviceUrl);
                             }
                             waitStatus = false;
                             return core.info(`The service has been deployed.`);
                         }
                         if (failureStatuses.includes(status)) {
                             if (createGithubDeployment) {
-                                yield githubService.createDeploymentStatus(deploymentId, serviceUrl, github_service_1.DeploymentState.FAILURE);
+                                yield githubService.createDeploymentStatus(deploymentId, github_service_1.DeploymentState.FAILURE);
                             }
                             return core.setFailed(`The deploy exited with status: ${status}.`);
                         }
@@ -164,7 +164,7 @@ class GitHubService {
             throw new Error(`github api error: ${response.data.message}`);
         });
     }
-    createDeploymentStatus(deploymentID, deploymentURL, state) {
+    createDeploymentStatus(deploymentID, state, deploymentURL) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.octo.rest.repos.createDeploymentStatus({
                 owner: this.config.owner,
@@ -294,8 +294,20 @@ class RenderService {
     }
     getServiceUrl() {
         return __awaiter(this, void 0, void 0, function* () {
+            const customDomain = yield this.getCustomDomain();
+            if (customDomain)
+                return `https://${customDomain}`;
             const response = yield this.client.get('');
             return response.data.url;
+        });
+    }
+    getCustomDomain() {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.client.get('/custom-domains', {
+                params: { verificationStatus: 'verified' }
+            });
+            return (_b = (_a = response.data[0]) === null || _a === void 0 ? void 0 : _a.customDomain.name) !== null && _b !== void 0 ? _b : undefined;
         });
     }
 }
