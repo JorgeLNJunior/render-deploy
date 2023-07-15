@@ -33,6 +33,20 @@ export class RenderService {
     })
     return response.data.id as string
   }
+
+  async getServiceUrl(): Promise<string> {
+    const customDomain = await this.getCustomDomain()
+    if (customDomain) return `https://${customDomain}`
+    const response = await this.client.get('')
+    return response.data.url as string
+  }
+
+  async getCustomDomain(): Promise<string | undefined> {
+    const response = await this.client.get('/custom-domains', {
+      params: {verificationStatus: 'verified'}
+    })
+    return response.data[0]?.customDomain.name ?? undefined
+  }
 }
 
 interface DeployOptions {

@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {AxiosError} from 'axios'
 
+import {DeploymentState, GitHubService} from './github.service'
 import {Seconds, wait} from './helpers/wait.helper'
 import {
   RenderDeployStatus,
@@ -15,9 +16,30 @@ export default class Action {
       const apiKey = core.getInput('api_key', {required: true})
       const clearCache = core.getBooleanInput('clear_cache')
       const waitDeploy = core.getBooleanInput('wait_deploy')
+
+      const createGithubDeployment = core.getBooleanInput('github_deployment')
+      const githubToken = core.getInput('github_token')
+      const environment = core.getInput('deployment_environment')
+
+      const [owner, repo] = (process.env.GITHUB_REPOSITORY as string).split('/')
+      const ref = process.env.GITHUB_REF as string
+
       const renderService = new RenderService({apiKey, serviceId})
+      const githubService = new GitHubService({githubToken, owner, repo})
 
       const deployId = await renderService.triggerDeploy({clearCache})
+      let serviceUrl = ''
+      let deploymentId = 0
+
+      if (createGithubDeployment) {
+        deploymentId = await githubService.createDeployment(ref, environment)
+        serviceUrl = await renderService.getServiceUrl()
+        await githubService.createDeploymentStatus(
+          deploymentId,
+          waitDeploy ? DeploymentState.IN_PROGRESS : DeploymentState.SUCCESS,
+          waitDeploy ? undefined : serviceUrl
+        )
+      }
 
       if (waitDeploy) {
         let waitStatus = true
@@ -37,11 +59,24 @@ export default class Action {
           const status = await renderService.verifyDeployStatus(deployId)
 
           if (status === RenderDeployStatus.LIVE) {
+            if (createGithubDeployment) {
+              await githubService.createDeploymentStatus(
+                deploymentId,
+                DeploymentState.SUCCESS,
+                serviceUrl
+              )
+            }
             waitStatus = false
             return core.info(`The service has been deployed.`)
           }
 
           if (failureStatuses.includes(status)) {
+            if (createGithubDeployment) {
+              await githubService.createDeploymentStatus(
+                deploymentId,
+                DeploymentState.FAILURE
+              )
+            }
             return core.setFailed(`The deploy exited with status: ${status}.`)
           }
 

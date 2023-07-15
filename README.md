@@ -21,19 +21,29 @@
 
 ## Usage
 
-- First you need to disable auto deploy option in your render app settings. `Settings > Build and Deploy > Auto-Deploy`. 
-- Add your `service id` and your render `api key` to your GitHub repository secrets. `Settings > Secrets > Actions`.
+- First you need to disable the auto deploy option in your render app settings. Go to `Settings > Build and Deploy > Auto-Deploy` and disable it. 
+- At your repository go to `Settings > Secrets and variables > Actions`.
+- Create a variable named `RENDER_SERVICE_ID` and insert your service id. You can get it in your render service page copying it from the url.
+- Create a variable named `RENDER_API_KEY` and insert your api key. You can get a key in your Render `Account Settings > API Keys`.
 - Add this action to your pipeline.
 
 ```yml
-steps:
-    - uses: actions/checkout@v3
-    - uses: JorgeLNJunior/render-deploy@v1.3.2
-      with:
-        service_id: ${{ secrets.RENDER_SERVICE_ID }} # required
-        api_key: ${{ secrets.RENDER_API_KEY }} # required
-        clear_cache: false # Clear build cache. Optional
-        wait_deploy: false # Wait until the deploy status is successful. Warning! Free Render services can take +5 minutes to be fully deployed. Optional
+  jobs: 
+    deploy:
+      runs-on: ubuntu-latest
+      permissions: # Required if github_deployment is set to true.
+        deployments: write
+      steps:
+          - uses: actions/checkout@v3
+          - uses: JorgeLNJunior/render-deploy@v1.4.0
+            with:
+              service_id: ${{ secrets.RENDER_SERVICE_ID }} # required
+              api_key: ${{ secrets.RENDER_API_KEY }} # required
+              clear_cache: false # Clear build cache. Optional
+              wait_deploy: false # Wait until the deploy status is successful. Warning! Free Render services can take +5 minutes to be fully deployed. Optional
+              github_deployment: false # Create a GitHub deployment. Optional
+              deployment_environment: 'production' # GitHub deployment enviroment name. Optional
+              github_token: ${{ secrets.GITHUB_TOKEN }} # Remove if github_deployment is false. Optional
 ```
 
 ## Licence
