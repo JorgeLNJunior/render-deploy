@@ -30,9 +30,9 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@octokit/request": "^8.1.0",
     "axios": "^1.4.0",
-    "node-fetch": "^2.6.12"
+    "node-fetch": "^2.6.12",
+    "octokit": "^3.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.6",
