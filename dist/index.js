@@ -132,12 +132,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeploymentState = exports.GitHubService = void 0;
 const request_1 = __nccwpck_require__(6234);
+const axios_1 = __importDefault(__nccwpck_require__(8757));
 class GitHubService {
     constructor(config) {
         this.config = config;
+        request_1.request.defaults({
+            request: { fetch: axios_1.default }
+        });
     }
     createDeployment(ref, environment) {
         return __awaiter(this, void 0, void 0, function* () {
