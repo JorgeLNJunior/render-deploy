@@ -149,7 +149,7 @@ class GitHubService {
     }
     createDeployment(ref, environment) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.octo.request('POST /repos/{owner}/{repo}/deployments', {
+            const response = yield this.octo.rest.repos.createDeployment({
                 owner: this.config.owner,
                 repo: this.config.repo,
                 headers: {
@@ -166,7 +166,7 @@ class GitHubService {
     }
     createDeploymentStatus(deploymentID, deploymentURL, state) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.octo.request('POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses', {
+            yield this.octo.rest.repos.createDeploymentStatus({
                 owner: this.config.owner,
                 repo: this.config.repo,
                 deployment_id: deploymentID,

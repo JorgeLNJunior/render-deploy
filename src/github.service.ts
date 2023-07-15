@@ -14,19 +14,16 @@ export class GitHubService {
   }
 
   async createDeployment(ref: string, environment?: string): Promise<number> {
-    const response = await this.octo.request(
-      'POST /repos/{owner}/{repo}/deployments',
-      {
-        owner: this.config.owner,
-        repo: this.config.repo,
-        headers: {
-          authorization: `Bearer ${this.config.githubToken}`
-        },
-        production_environment: true,
-        environment,
-        ref
-      }
-    )
+    const response = await this.octo.rest.repos.createDeployment({
+      owner: this.config.owner,
+      repo: this.config.repo,
+      headers: {
+        authorization: `Bearer ${this.config.githubToken}`
+      },
+      production_environment: true,
+      environment,
+      ref
+    })
     if (response.status === 201) return response.data.id
     throw new Error(`github api error: ${response.data.message}`)
   }
@@ -36,17 +33,14 @@ export class GitHubService {
     deploymentURL: string,
     state: DeploymentState
   ): Promise<void> {
-    await this.octo.request(
-      'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
-      {
-        owner: this.config.owner,
-        repo: this.config.repo,
-        deployment_id: deploymentID,
-        log_url: deploymentURL,
-        environment_url: deploymentURL,
-        state
-      }
-    )
+    await this.octo.rest.repos.createDeploymentStatus({
+      owner: this.config.owner,
+      repo: this.config.repo,
+      deployment_id: deploymentID,
+      log_url: deploymentURL,
+      environment_url: deploymentURL,
+      state
+    })
   }
 }
 
