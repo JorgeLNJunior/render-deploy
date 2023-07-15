@@ -1,5 +1,5 @@
 import {request} from '@octokit/request'
-import axios from 'axios'
+import fetch from 'node-fetch'
 
 export class GitHubService {
   private config: GitHubConfig
@@ -7,9 +7,8 @@ export class GitHubService {
   constructor(config: GitHubConfig) {
     this.config = config
     request.defaults({
-      request: {fetch: axios.create()}
+      request: {fetch}
     })
-    request.endpoint.DEFAULTS.request?.fetch
   }
 
   async createDeployment(ref: string, environment?: string): Promise<number> {
