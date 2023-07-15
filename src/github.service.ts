@@ -38,8 +38,6 @@ export class GitHubService {
       repo: this.config.repo,
       deployment_id: deploymentID,
       environment_url: deploymentURL,
-      log_url: deploymentURL,
-      target_url: deploymentURL,
       state
     })
   }
