@@ -152,10 +152,8 @@ class GitHubService {
             const response = yield this.octo.rest.repos.createDeployment({
                 owner: this.config.owner,
                 repo: this.config.repo,
-                headers: {
-                    authorization: `Bearer ${this.config.githubToken}`
-                },
                 production_environment: true,
+                required_contexts: [],
                 environment,
                 ref
             });
