@@ -21,6 +21,7 @@ export class GitHubService {
         authorization: `Bearer ${this.config.githubToken}`
       },
       production_environment: true,
+      required_contexts: [],
       environment,
       ref
     })
