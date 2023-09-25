@@ -31,7 +31,6 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "axios": "^1.4.0",
-    "node-fetch": "^2.6.12",
     "octokit": "^3.0.0"
   },
   "devDependencies": {

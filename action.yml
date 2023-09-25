@@ -28,7 +28,7 @@ inputs:
     description: 'The name of the enviroment'
     default: 'production'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: 'upload-cloud'

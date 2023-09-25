@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import {Octokit} from 'octokit'
 
 export class GitHubService {
@@ -8,8 +7,7 @@ export class GitHubService {
   constructor(config: GitHubConfig) {
     this.config = config
     this.octo = new Octokit({
-      auth: this.config.githubToken,
-      request: {fetch}
+      auth: this.config.githubToken
     })
   }
 
