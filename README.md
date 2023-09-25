@@ -35,7 +35,7 @@
         deployments: write
       steps:
           - uses: actions/checkout@v3
-          - uses: JorgeLNJunior/render-deploy@v1.4.1
+          - uses: JorgeLNJunior/render-deploy@v1.4.2
             with:
               service_id: ${{ secrets.RENDER_SERVICE_ID }} # required
               api_key: ${{ secrets.RENDER_API_KEY }} # required
