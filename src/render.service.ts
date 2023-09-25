@@ -13,9 +13,10 @@ export class RenderService {
   }
 
   /**
-   * Given a deploy id, returns the deploy status.
-   * @param deployId The id of the deploy.
-   * @returns A `RenderDeployStatus`.
+   * Given a deploy ID, returns its status.
+   *
+   * @param {string} deployId - The ID of the deploy.
+   * @return {Promise<RenderDeployStatus>} A promise that resolves with the deploy status.
    */
   async verifyDeployStatus(deployId: string): Promise<RenderDeployStatus> {
     const response = await this.client.get(`/deploys/${deployId}`)
@@ -23,9 +24,10 @@ export class RenderService {
   }
 
   /**
-   * Trigger a new deploy.
-   * @param options Deploy options.
-   * @returns The id of the deploy
+   * Triggers a deploy with the given options.
+   *
+   * @param {DeployOptions} options - The options for the deploy.
+   * @return {Promise<string>} - A string representing the ID of the deploy.
    */
   async triggerDeploy(options: DeployOptions): Promise<string> {
     const response = await this.client.post('/deploys', {
@@ -34,6 +36,11 @@ export class RenderService {
     return response.data.id as string
   }
 
+  /**
+   * Retrieves the service URL. Suports custom domains.
+   *
+   * @return {Promise<string>} The service URL.
+   */
   async getServiceUrl(): Promise<string> {
     const customDomain = await this.getCustomDomain()
     if (customDomain) return `https://${customDomain}`
@@ -41,7 +48,12 @@ export class RenderService {
     return response.data.url as string
   }
 
-  async getCustomDomain(): Promise<string | undefined> {
+  /**
+   * Retrieves the custom domain associated with the service.
+   *
+   * @return {Promise<string | undefined>} The custom domain or undefined if not found.
+   */
+  private async getCustomDomain(): Promise<string | undefined> {
     const response = await this.client.get('/custom-domains', {
       params: {verificationStatus: 'verified'}
     })
