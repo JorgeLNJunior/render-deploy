@@ -58,7 +58,7 @@ jobs:
       - name: commit and push changes
         run: |
           git add .
-          git commit -m "build: package all build files" || echo "No changes to commit"
+          git commit -m "build: package all files" || echo "No changes to commit"
           git push
 
   release:

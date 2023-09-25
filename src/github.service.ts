@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import {Octokit} from 'octokit'
 
 export class GitHubService {
@@ -8,11 +7,17 @@ export class GitHubService {
   constructor(config: GitHubConfig) {
     this.config = config
     this.octo = new Octokit({
-      auth: this.config.githubToken,
-      request: {fetch}
+      auth: this.config.githubToken
     })
   }
 
+  /**
+   * Creates a deployment.
+   *
+   * @param {string} ref - The reference to the commit to deploy.
+   * @param {string} [environment] - The environment to deploy the commit to.
+   * @return {Promise<number>} The ID of the created deployment.
+   */
   async createDeployment(ref: string, environment?: string): Promise<number> {
     const response = await this.octo.rest.repos.createDeployment({
       owner: this.config.owner,
@@ -26,6 +31,14 @@ export class GitHubService {
     throw new Error(`github api error: ${response.data.message}`)
   }
 
+  /**
+   * Creates a deployment status for a given deployment ID.
+   *
+   * @param {number} deploymentID - The ID of the deployment.
+   * @param {DeploymentState} state - The state of the deployment.
+   * @param {string} [deploymentURL] - The URL to access the deployed application (optional).
+   * @return {Promise<void>} A promise that resolves when the deployment status is created.
+   */
   async createDeploymentStatus(
     deploymentID: number,
     state: DeploymentState,
