@@ -23,29 +23,70 @@
 
 - First you need to disable the auto deploy option in your render app settings. Go to `Settings > Build and Deploy > Auto-Deploy` and disable it. 
 - At your repository go to `Settings > Secrets and variables > Actions`.
-- Create a variable named `RENDER_SERVICE_ID` and insert your service id. You can get it in your render service page copying it from the url.
-- Create a variable named `RENDER_API_KEY` and insert your api key. You can get a key in your Render `Account Settings > API Keys`.
-- Add this action to your pipeline.
+- Create a variable named `RENDER_SERVICE_ID` and insert your service id into it. You can get it in your render service page by copying it from the URL.
+- Create a variable named `RENDER_API_KEY` and insert your api key into it. You can get a key in your Render `Account Settings > API Keys`.
+- Choose a template and add it to your pipeline.
 
+### Minimal
 ```yml
-  jobs: 
-    deploy:
-      runs-on: ubuntu-latest
-      permissions: # Required if github_deployment is set to true.
-        deployments: write
-      steps:
-          - uses: actions/checkout@v3
-          - uses: JorgeLNJunior/render-deploy@v1.4.3
-            with:
-              service_id: ${{ secrets.RENDER_SERVICE_ID }} # required
-              api_key: ${{ secrets.RENDER_API_KEY }} # required
-              clear_cache: false # Clear build cache. Optional
-              wait_deploy: false # Wait until the deploy status is successful. Warning! Free Render services can take +5 minutes to be fully deployed. Optional
-              github_deployment: false # Create a GitHub deployment. Optional
-              deployment_environment: 'production' # GitHub deployment enviroment name. Optional
-              github_token: ${{ secrets.GITHUB_TOKEN }} # Remove if github_deployment is false. Optional
+deploy:
+  runs-on: ubuntu-latest
+  steps:
+      - uses: actions/checkout@v3
+      - uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.RENDER_API_KEY }}
 ```
 
+### Wait for deploy status
+```yml
+deploy:
+  runs-on: ubuntu-latest
+  steps:
+      - uses: actions/checkout@v3
+      - uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.RENDER_API_KEY }}
+          wait_deploy: true 
+```
+
+### Create a github deployment
+```yml
+deploy:
+  runs-on: ubuntu-latest
+  permissions:
+    deployments: write
+  steps:
+      - uses: actions/checkout@v3
+      - uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.RENDER_API_KEY }}
+          github_deployment: true 
+          deployment_environment: 'production'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Full
+```yml
+deploy:
+  runs-on: ubuntu-latest
+  permissions:
+    deployments: write
+  steps:
+      - uses: actions/checkout@v3
+      - uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.RENDER_API_KEY }}
+          clear_cache: true
+          wait_deploy: true
+          github_deployment: true
+          deployment_environment: 'production'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+```
 ## Licence
 
 Project under [MIT »](/LICENSE) license.
