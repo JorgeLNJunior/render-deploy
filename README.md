@@ -21,10 +21,10 @@
 
 ## Usage
 
-- First you need to disable the auto deploy option in your render app settings. Go to `Settings > Build and Deploy > Auto-Deploy` and disable it. 
-- At your repository go to `Settings > Secrets and variables > Actions`.
-- Create a variable named `RENDER_SERVICE_ID` and insert your service id into it. You can get it in your render service page by copying it from the URL.
-- Create a variable named `RENDER_API_KEY` and insert your api key into it. You can get a key in your Render `Account Settings > API Keys`.
+- First, you need to disable the auto-deploy option in your render app settings. Go to `Settings > Build and Deploy > Auto-Deploy` and disable it.
+- In your repository, go to `Settings > Secrets and Variables > Actions`.
+- Create a variable named `RENDER_SERVICE_ID` and insert your service ID into it. You can get it on your render service page by copying it from the URL.
+- Create a variable named `RENDER_API_KEY` and insert your API key into it. You can get a key in your Render `Account Settings > API Keys`.
 - Choose a template and add it to your pipeline.
 
 ### Minimal
