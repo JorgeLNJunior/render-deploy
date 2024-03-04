@@ -391,6 +391,9 @@ describe('GitHub deployment', () => {
     jest
       .spyOn(RenderService.prototype, 'getServiceUrl')
       .mockResolvedValueOnce('url')
+    jest
+      .spyOn(GitHubService.prototype, 'createDeploymentStatus')
+      .mockResolvedValueOnce()
     const spy = jest
       .spyOn(GitHubService.prototype, 'createDeployment')
       .mockResolvedValueOnce(1)
@@ -459,7 +462,7 @@ describe('GitHub deployment', () => {
         .mockResolvedValueOnce(deploymentID)
       const spy = jest
         .spyOn(GitHubService.prototype, 'createDeploymentStatus')
-        .mockResolvedValueOnce()
+        .mockResolvedValue()
 
       await new Action().run()
 
