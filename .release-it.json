@@ -1,7 +1,7 @@
 {
   "git": {
     "commitMessage": "chore: bump v${version}",
-    "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs",
+    "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
     "tagName": "v${version}"
   },
   "hooks": {
