@@ -8,13 +8,11 @@
     "prepare": "husky",
     "prebuild": "rimraf lib",
     "build": "tsc",
-    "format": "prettier --write '**/*.ts'",
-    "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint .",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "test:cov": "jest --coverage",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
+    "all": "npm run build && npm run lint && npm run package && npm test",
     "release": "release-it --ci"
   },
   "repository": {
@@ -47,7 +45,6 @@
     "jest": "^29.7.0",
     "js-yaml": "^4.1.0",
     "lint-staged": "^15.2.2",
-    "prettier": "3.2.5",
     "release-it": "^17.1.1",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.2",
@@ -56,8 +53,7 @@
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "eslint --cache --fix",
-      "prettier --write"
+      "eslint --cache --fix"
     ]
   }
 }
