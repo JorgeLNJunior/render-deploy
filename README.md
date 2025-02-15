@@ -1,12 +1,12 @@
 <div align="center" id="short-description-and-logo">
 
   <!-- Logo -->
-  <!-- <img src="https://ps.w.org/wp-githuber-md/assets/icon-256x256.png?rev=2194656" width="200px">  -->
+  <img src="https://i.ibb.co/BS1ZjJb/render-community-large-icon-removebg-preview.png" alt="render-community-large-icon-removebg-preview" border="0" width="200px">
 
   <!-- Título -->
   <h1>Render Deploy</h1>
 
-  Deploy your [Render](https://render.com) app through GitHub Actions.
+  Deploy your [Render](https://render.com) application through GitHub Actions.
 
 </div>
 
