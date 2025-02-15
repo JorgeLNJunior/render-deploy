@@ -1,14 +1,14 @@
 import * as core from '@actions/core'
-import {describe, expect, jest, test} from '@jest/globals'
+import { describe, expect, jest, test } from '@jest/globals'
 
-import Action from '../src/action'
-import {DeploymentState, GitHubService} from '../src/github.service'
+import Action from '../src/action.js'
+import { DeploymentState, GitHubService } from '../src/github.service.js'
 import {
   RenderDeployStatus,
   RenderErrorResponse,
   RenderService
-} from '../src/render.service'
-import {getAxiosError} from './helpers/axios.helper'
+} from '../src/render.service.js'
+import { getAxiosError } from './helpers/axios.helper.js'
 
 describe('Inputs', () => {
   test('should throw an error if the input "service_id" is missing', async () => {
