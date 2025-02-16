@@ -1,10 +1,10 @@
 <div align="center" id="short-description-and-logo">
-
-  <img src="https://i.ibb.co/BS1ZjJb/render-community-large-icon-removebg-preview.png" alt="render-community-large-icon-removebg-preview" border="0" width="200px">
+  
+  <img src="https://i.ibb.co/BS1ZjJb/render-community-large-icon-removebg-preview.png" alt="render-icon" border="0" width="200px">
 
   <h1>Render Deploy</h1>
 
-  <p>A GitHub Action to deploy your application to <a href="https://render.com" target="_blank">Render</a>.</p>
+  <p>A GitHub Action to deploy your application to <a href="https://render.com" target="_blank" rel="noreferrer noopener">Render</a>.</p>
 
 </div>
 
