@@ -1,18 +1,18 @@
 import * as core from '@actions/core'
-import {describe, expect, jest, test} from '@jest/globals'
+import { describe, expect, test, vi } from 'vitest'
 
-import Action from '../src/action'
-import {DeploymentState, GitHubService} from '../src/github.service'
+import Action from '../src/action.js'
+import { DeploymentState, GitHubService } from '../src/github.service.js'
 import {
   RenderDeployStatus,
   RenderErrorResponse,
   RenderService
-} from '../src/render.service'
-import {getAxiosError} from './helpers/axios.helper'
+} from '../src/render.service.js'
+import { getAxiosError } from './helpers/axios.helper.js'
 
 describe('Inputs', () => {
   test('should throw an error if the input "service_id" is missing', async () => {
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
     await new Action().run()
 
@@ -25,7 +25,7 @@ describe('Inputs', () => {
   test('should throw an error if the input "api_key" is missing', async () => {
     process.env['INPUT_SERVICE_ID'] = 'serviceId'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
     await new Action().run()
 
@@ -43,7 +43,7 @@ describe('Inputs', () => {
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
     process.env['GITHUB_REPOSITORY'] = 'action/test'
 
-    const spy = jest
+    const spy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('')
 
@@ -66,7 +66,7 @@ describe('Deploy', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const spy = jest
+    const spy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
 
@@ -84,10 +84,10 @@ describe('Deploy', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
-    const spy = jest
+    const spy = vi
       .spyOn(RenderService.prototype, 'verifyDeployStatus')
       .mockResolvedValueOnce(RenderDeployStatus.LIVE)
 
@@ -107,16 +107,16 @@ describe('Deploy', () => {
 
     const status = RenderDeployStatus.BUILD_IN_PROGRESS
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
-    jest
+    vi
       .spyOn(RenderService.prototype, 'verifyDeployStatus')
       .mockResolvedValueOnce(status) // first call
-    jest
+    vi
       .spyOn(RenderService.prototype, 'verifyDeployStatus')
       .mockResolvedValueOnce(RenderDeployStatus.LIVE) // second call
-    const spy = jest.spyOn(core, 'info')
+    const spy = vi.spyOn(core, 'info')
 
     await new Action().run()
 
@@ -133,13 +133,13 @@ describe('Deploy', () => {
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      const spy = jest
+      const spy = vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.BUILD_FAILED)
-      const coreSpy = jest.spyOn(core, 'setFailed')
+      const coreSpy = vi.spyOn(core, 'setFailed')
 
       await new Action().run()
 
@@ -158,13 +158,13 @@ describe('Deploy', () => {
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      const spy = jest
+      const spy = vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.CANCELED)
-      const coreSpy = jest.spyOn(core, 'setFailed')
+      const coreSpy = vi.spyOn(core, 'setFailed')
 
       await new Action().run()
 
@@ -183,13 +183,13 @@ describe('Deploy', () => {
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      const spy = jest
+      const spy = vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.DEACTIVATED)
-      const coreSpy = jest.spyOn(core, 'setFailed')
+      const coreSpy = vi.spyOn(core, 'setFailed')
 
       await new Action().run()
 
@@ -208,13 +208,13 @@ describe('Deploy', () => {
       process.env['INPUT_WAIT_DEPLOY'] = 'true'
       process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      const spy = jest
+      const spy = vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.UPLOAD_FAILED)
-      const coreSpy = jest.spyOn(core, 'setFailed')
+      const coreSpy = vi.spyOn(core, 'setFailed')
 
       await new Action().run()
 
@@ -236,9 +236,9 @@ describe('Render error handling', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockRejectedValueOnce(getAxiosError(401))
 
@@ -257,9 +257,9 @@ describe('Render error handling', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockRejectedValueOnce(getAxiosError(404))
 
@@ -278,9 +278,9 @@ describe('Render error handling', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockRejectedValueOnce(getAxiosError(429))
 
@@ -299,9 +299,9 @@ describe('Render error handling', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockRejectedValueOnce(getAxiosError(500))
 
@@ -320,9 +320,9 @@ describe('Render error handling', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockRejectedValueOnce(getAxiosError(503))
 
@@ -341,9 +341,9 @@ describe('Render error handling', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const coreSpy = jest.spyOn(core, 'setFailed')
+    const coreSpy = vi.spyOn(core, 'setFailed')
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockRejectedValueOnce(getAxiosError(507))
 
@@ -364,10 +364,10 @@ describe('GitHub deployment', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
-    const spy = jest
+    const spy = vi
       .spyOn(GitHubService.prototype, 'createDeployment')
       .mockResolvedValueOnce(1)
 
@@ -385,16 +385,16 @@ describe('GitHub deployment', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
 
-    jest
+    vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
-    jest
+    vi
       .spyOn(RenderService.prototype, 'getServiceUrl')
       .mockResolvedValueOnce('url')
-    jest
+    vi
       .spyOn(GitHubService.prototype, 'createDeploymentStatus')
       .mockResolvedValueOnce()
-    const spy = jest
+    const spy = vi
       .spyOn(GitHubService.prototype, 'createDeployment')
       .mockResolvedValueOnce(1)
 
@@ -417,16 +417,16 @@ describe('GitHub deployment', () => {
       const state = DeploymentState.SUCCESS
       const serviceURL = 'https://my-service.onrender.com'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      jest
+      vi
         .spyOn(RenderService.prototype, 'getServiceUrl')
         .mockResolvedValueOnce(serviceURL)
-      jest
+      vi
         .spyOn(GitHubService.prototype, 'createDeployment')
         .mockResolvedValueOnce(deploymentID)
-      const spy = jest
+      const spy = vi
         .spyOn(GitHubService.prototype, 'createDeploymentStatus')
         .mockResolvedValueOnce()
 
@@ -448,19 +448,19 @@ describe('GitHub deployment', () => {
       const state = DeploymentState.IN_PROGRESS
       const serviceURL = 'https://my-service.onrender.com'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      jest
+      vi
         .spyOn(RenderService.prototype, 'getServiceUrl')
         .mockResolvedValueOnce(serviceURL)
-      jest
+      vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.LIVE)
-      jest
+      vi
         .spyOn(GitHubService.prototype, 'createDeployment')
         .mockResolvedValueOnce(deploymentID)
-      const spy = jest
+      const spy = vi
         .spyOn(GitHubService.prototype, 'createDeploymentStatus')
         .mockResolvedValue()
 
@@ -482,22 +482,22 @@ describe('GitHub deployment', () => {
       const state = DeploymentState.SUCCESS
       const serviceURL = 'https://my-service.onrender.com'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      jest
+      vi
         .spyOn(RenderService.prototype, 'getServiceUrl')
         .mockResolvedValueOnce(serviceURL)
-      jest
+      vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.LIVE)
-      jest
+      vi
         .spyOn(GitHubService.prototype, 'createDeployment')
         .mockResolvedValueOnce(deploymentID)
-      jest
+      vi
         .spyOn(GitHubService.prototype, 'createDeploymentStatus') // in progress call
         .mockResolvedValueOnce()
-      const spy = jest
+      const spy = vi
         .spyOn(GitHubService.prototype, 'createDeploymentStatus') // live deploy call
         .mockResolvedValueOnce()
 
@@ -519,22 +519,22 @@ describe('GitHub deployment', () => {
       const state = DeploymentState.FAILURE
       const serviceURL = 'https://my-service.onrender.com'
 
-      jest
+      vi
         .spyOn(RenderService.prototype, 'triggerDeploy')
         .mockResolvedValueOnce('id')
-      jest
+      vi
         .spyOn(RenderService.prototype, 'getServiceUrl')
         .mockResolvedValueOnce(serviceURL)
-      jest
+      vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.BUILD_FAILED)
-      jest
+      vi
         .spyOn(GitHubService.prototype, 'createDeployment')
         .mockResolvedValueOnce(deploymentID)
-      jest
+      vi
         .spyOn(GitHubService.prototype, 'createDeploymentStatus') // in progress call
         .mockResolvedValueOnce()
-      const spy = jest
+      const spy = vi
         .spyOn(GitHubService.prototype, 'createDeploymentStatus') // live deploy call
         .mockResolvedValueOnce()
 

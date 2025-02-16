@@ -1,19 +1,19 @@
 import * as core from '@actions/core'
-import {AxiosError} from 'axios'
+import { AxiosError } from 'axios'
 
-import {DeploymentState, GitHubService} from './github.service'
-import {Seconds, wait} from './helpers/wait.helper'
+import { DeploymentState, GitHubService } from './github.service.js'
+import { Seconds, wait } from './helpers/wait.helper.js'
 import {
   RenderDeployStatus,
   RenderErrorResponse,
   RenderService
-} from './render.service'
+} from './render.service.js'
 
 export default class Action {
   async run(): Promise<void> {
     try {
-      const serviceId = core.getInput('service_id', {required: true})
-      const apiKey = core.getInput('api_key', {required: true})
+      const serviceId = core.getInput('service_id', { required: true })
+      const apiKey = core.getInput('api_key', { required: true })
       const clearCache = core.getBooleanInput('clear_cache')
       const waitDeploy = core.getBooleanInput('wait_deploy')
 
@@ -24,10 +24,10 @@ export default class Action {
       const [owner, repo] = (process.env.GITHUB_REPOSITORY as string).split('/')
       const ref = process.env.GITHUB_REF as string
 
-      const renderService = new RenderService({apiKey, serviceId})
-      const githubService = new GitHubService({githubToken, owner, repo})
+      const renderService = new RenderService({ apiKey, serviceId })
+      const githubService = new GitHubService({ githubToken, owner, repo })
 
-      const deployId = await renderService.triggerDeploy({clearCache})
+      const deployId = await renderService.triggerDeploy({ clearCache })
       let serviceUrl = ''
       let deploymentId = 0
 
@@ -92,7 +92,7 @@ export default class Action {
 
         return core.setFailed(
           RenderErrorResponse[status as keyof typeof RenderErrorResponse] ||
-            'Unexpected error'
+          'Unexpected error'
         )
       }
       if (error instanceof Error) return core.setFailed(error.message)

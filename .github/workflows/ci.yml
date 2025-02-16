@@ -4,17 +4,16 @@ on:
   push:
     branches:
       - main
-      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20'
       - run: |
           npm ci
           npm run build
@@ -23,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20'
       - run: npm ci
       - run: npm run test:cov
         env:
@@ -42,10 +41,10 @@ jobs:
     needs: [build, test]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20'
       - name: package
         run: |
           npm ci
@@ -60,21 +59,3 @@ jobs:
           git add .
           git commit -m "build: package all files" || echo "No changes to commit"
           git push
-
-  release:
-    runs-on: ubuntu-latest
-    needs: [package]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: git config
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git pull
-      - run: npm ci
-      - run: npm run release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

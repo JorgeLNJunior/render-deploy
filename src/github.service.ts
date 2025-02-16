@@ -1,4 +1,4 @@
-import {Octokit} from 'octokit'
+import { Octokit } from 'octokit'
 
 export class GitHubService {
   private config: GitHubConfig
