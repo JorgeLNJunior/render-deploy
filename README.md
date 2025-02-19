@@ -50,7 +50,6 @@ This GitHub Action simplifies the deployment process to Render.  It allows you t
 deploy:
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v4
     - uses: JorgeLNJunior/render-deploy@v1.4.5
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
@@ -63,7 +62,6 @@ deploy:
 deploy:
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v4
     - uses: JorgeLNJunior/render-deploy@v1.4.5
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
@@ -79,7 +77,6 @@ deploy:
   permissions:
     deployments: write
   steps:
-    - uses: actions/checkout@v4
     - uses: JorgeLNJunior/render-deploy@v1.4.5
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
@@ -97,7 +94,6 @@ deploy:
   permissions:
     deployments: write
   steps:
-    - uses: actions/checkout@v4
     - uses: JorgeLNJunior/render-deploy@v1.4.5
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
