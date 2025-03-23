@@ -1,6 +1,6 @@
 <div align="center" id="short-description-and-logo">
   
-  <img src="https://i.ibb.co/BS1ZjJb/render-community-large-icon-removebg-preview.png" alt="render-icon" border="0" width="200px">
+  <img src=".github/render.png" alt="render-icon" border="0" width="200px">
 
   <h1>Render Deploy</h1>
 
