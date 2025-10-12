@@ -52,7 +52,8 @@ export default class Action {
             RenderDeployStatus.BUILD_FAILED,
             RenderDeployStatus.CANCELED,
             RenderDeployStatus.DEACTIVATED,
-            RenderDeployStatus.UPLOAD_FAILED
+            RenderDeployStatus.UPLOAD_FAILED,
+            RenderDeployStatus.PRE_DEPLOY_FAILED
           ]
 
           await wait(Seconds.TEN)
