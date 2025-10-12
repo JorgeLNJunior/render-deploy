@@ -46360,6 +46360,9 @@ var RenderDeployStatus;
     RenderDeployStatus["BUILD_FAILED"] = "build_failed";
     RenderDeployStatus["UPLOAD_FAILED"] = "update_failed";
     RenderDeployStatus["CANCELED"] = "canceled";
+    RenderDeployStatus["QUEUED"] = "queued";
+    RenderDeployStatus["PRE_DEPLOY_IN_PROGRESS"] = "pre_deploy_in_progress";
+    RenderDeployStatus["PRE_DEPLOY_FAILED"] = "pre_deploy_failed";
 })(RenderDeployStatus || (RenderDeployStatus = {}));
 const RenderErrorResponse = {
     400: 'The request could not be understood by the server.',
@@ -46410,7 +46413,8 @@ class Action {
                         RenderDeployStatus.BUILD_FAILED,
                         RenderDeployStatus.CANCELED,
                         RenderDeployStatus.DEACTIVATED,
-                        RenderDeployStatus.UPLOAD_FAILED
+                        RenderDeployStatus.UPLOAD_FAILED,
+                        RenderDeployStatus.PRE_DEPLOY_FAILED
                     ];
                     await wait_helper_wait(Seconds.TEN);
                     const status = await renderService.verifyDeployStatus(deployId);
