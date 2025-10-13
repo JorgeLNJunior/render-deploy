@@ -1,14 +1,23 @@
 import * as core from '@actions/core'
-import { describe, expect, test, vi } from 'vitest'
+import {afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import Action from '../src/action.js'
 import { DeploymentState, GitHubService } from '../src/github.service.js'
+import * as WaitHelper from "../src/helpers/wait.helper.js";
 import {
   RenderDeployStatus,
   RenderErrorResponse,
   RenderService
 } from '../src/render.service.js'
 import { getAxiosError } from './helpers/axios.helper.js'
+
+beforeEach(() => {
+  vi.spyOn(WaitHelper, 'wait').mockResolvedValue();
+})
+
+afterEach(() => {
+  vi.clearAllMocks();
+})
 
 describe('Inputs', () => {
   test('should throw an error if the input "service_id" is missing', async () => {
