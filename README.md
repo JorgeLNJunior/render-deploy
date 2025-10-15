@@ -50,7 +50,7 @@ This GitHub Action simplifies the deployment process to Render.  It allows you t
 deploy:
   runs-on: ubuntu-latest
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.5
+    - uses: JorgeLNJunior/render-deploy@v1.4.6
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -62,7 +62,7 @@ deploy:
 deploy:
   runs-on: ubuntu-latest
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.5
+    - uses: JorgeLNJunior/render-deploy@v1.4.6
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -77,7 +77,7 @@ deploy:
   permissions:
     deployments: write
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.5
+    - uses: JorgeLNJunior/render-deploy@v1.4.6
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -94,7 +94,7 @@ deploy:
   permissions:
     deployments: write
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.5
+    - uses: JorgeLNJunior/render-deploy@v1.4.6
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
