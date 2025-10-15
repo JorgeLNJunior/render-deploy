@@ -1,14 +1,23 @@
 import * as core from '@actions/core'
-import { describe, expect, test, vi } from 'vitest'
+import {afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import Action from '../src/action.js'
 import { DeploymentState, GitHubService } from '../src/github.service.js'
+import * as WaitHelper from "../src/helpers/wait.helper.js";
 import {
   RenderDeployStatus,
   RenderErrorResponse,
   RenderService
 } from '../src/render.service.js'
 import { getAxiosError } from './helpers/axios.helper.js'
+
+beforeEach(() => {
+  vi.spyOn(WaitHelper, 'wait').mockResolvedValue();
+})
+
+afterEach(() => {
+  vi.clearAllMocks();
+})
 
 describe('Inputs', () => {
   test('should throw an error if the input "service_id" is missing', async () => {
@@ -528,6 +537,43 @@ describe('GitHub deployment', () => {
       vi
         .spyOn(RenderService.prototype, 'verifyDeployStatus')
         .mockResolvedValueOnce(RenderDeployStatus.BUILD_FAILED)
+      vi
+        .spyOn(GitHubService.prototype, 'createDeployment')
+        .mockResolvedValueOnce(deploymentID)
+      vi
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus') // in progress call
+        .mockResolvedValueOnce()
+      const spy = vi
+        .spyOn(GitHubService.prototype, 'createDeploymentStatus') // live deploy call
+        .mockResolvedValueOnce()
+
+      await new Action().run()
+
+      expect(spy).toHaveBeenCalledWith(deploymentID, state)
+    })
+
+    test('should create a deployment with failure state if the pre_deploy status is failure', async () => {
+      process.env['GITHUB_REPOSITORY'] = 'action/test'
+      process.env['GITHUB_REF'] = 'main'
+      process.env['INPUT_SERVICE_ID'] = 'my service id'
+      process.env['INPUT_API_KEY'] = 'my api key'
+      process.env['INPUT_CLEAR_CACHE'] = 'false'
+      process.env['INPUT_WAIT_DEPLOY'] = 'true'
+      process.env['INPUT_GITHUB_DEPLOYMENT'] = 'true'
+
+      const deploymentID = 1
+      const state = DeploymentState.FAILURE
+      const serviceURL = 'https://my-service.onrender.com'
+
+      vi
+        .spyOn(RenderService.prototype, 'triggerDeploy')
+        .mockResolvedValueOnce('id')
+      vi
+        .spyOn(RenderService.prototype, 'getServiceUrl')
+        .mockResolvedValueOnce(serviceURL)
+      vi
+        .spyOn(RenderService.prototype, 'verifyDeployStatus')
+        .mockResolvedValueOnce(RenderDeployStatus.PRE_DEPLOY_FAILED)
       vi
         .spyOn(GitHubService.prototype, 'createDeployment')
         .mockResolvedValueOnce(deploymentID)

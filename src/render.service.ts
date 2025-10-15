@@ -81,7 +81,10 @@ export enum RenderDeployStatus {
   DEACTIVATED = 'deactivated',
   BUILD_FAILED = 'build_failed',
   UPLOAD_FAILED = 'update_failed',
-  CANCELED = 'canceled'
+  CANCELED = 'canceled',
+  QUEUED = 'queued',
+  PRE_DEPLOY_IN_PROGRESS = 'pre_deploy_in_progress',
+  PRE_DEPLOY_FAILED = 'pre_deploy_failed'
 }
 
 export const RenderErrorResponse = {
