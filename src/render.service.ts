@@ -1,5 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 
+import { Seconds, wait } from './helpers/wait.helper.js'
+
 export class RenderService {
   private client: AxiosInstance
 
@@ -30,10 +32,29 @@ export class RenderService {
    * @return {Promise<string>} - A string representing the ID of the deploy.
    */
   async triggerDeploy(options: DeployOptions): Promise<string> {
+    // subtracting 10 seconds to avoid clock-sync issues.
+    const currentTime = new Date(Date.now() - 10000).toISOString()
+
     const response = await this.client.post('/deploys', {
       clearCache: options.clearCache ? 'clear' : 'do_not_clear',
     })
-    return response.data.id as string
+
+    if (response.status == 201) {
+      return response.data.id as string
+    }
+
+    // "Queued" response status.
+    if (response.status == 202) {
+      // I don't know how Render handles queued deploys. Waiting some seconds to ensure the deploy has started.
+      await wait(Seconds.FIVE)
+      const deploy = await this.latestDeployCreatedAfter(currentTime)
+      if (!deploy) throw new Error(`Can't find the triggered deploy.`)
+      return deploy.id
+    }
+
+    throw new Error(
+      `Unexpected response status while triggering a deploy: Status: ${response.status}, Data: ${response.data}`,
+    )
   }
 
   /**
@@ -46,6 +67,30 @@ export class RenderService {
     if (customDomain) return `https://${customDomain}`
     const response = await this.client.get('')
     return response.data.url as string
+  }
+
+  /**
+   * Retrieves the latest deploy trigered after a date.
+   *
+   * @param {DeployOptions} date - A date specified as an ISO 8601 timestamp.
+   * @return {Promise<RenderDeployResponse | undefined>} The deploy data.
+   */
+  private async latestDeployCreatedAfter(
+    date: string,
+  ): Promise<RenderDeployResponse | undefined> {
+    const response = await this.client.get(`/deploys`, {
+      params: {
+        createdAfter: date,
+      },
+    })
+
+    if (response.status != 200) {
+      throw new Error(
+        `Got a non 200 response while retrieving a list of deploys, status: ${response.status}`,
+      )
+    }
+
+    return response.data[0]
   }
 
   /**
@@ -71,6 +116,11 @@ interface RenderOptions {
   apiKey: string
   /** Render Service ID. */
   serviceId: string
+}
+
+interface RenderDeployResponse {
+  id: string
+  status: RenderDeployStatus
 }
 
 export enum RenderDeployStatus {

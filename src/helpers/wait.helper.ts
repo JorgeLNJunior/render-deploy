@@ -9,5 +9,6 @@ export async function wait(seconds: Seconds): Promise<void> {
 }
 
 export enum Seconds {
+  FIVE = 5,
   TEN = 10,
 }
