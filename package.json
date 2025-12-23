@@ -1,7 +1,7 @@
 {
   "name": "@jorgelnjunior/render-deploy",
   "description": "A simple action to deploy applications to render.com",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "author": "JorgeLNJunior",
   "private": true,
   "license": "MIT",
