@@ -112,12 +112,19 @@ export default class Action {
       }
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status) {
-        core.debug(`Error response:\n${JSON.stringify(error.toJSON())}`)
-        const status = error.response.status
+        core.error(`Error response:\n${JSON.stringify(error.toJSON())}`)
+        core.error(
+          `${JSON.stringify({
+            url: error.response?.config.url,
+            status: error.response?.status,
+            data: error.response?.data,
+          })}`,
+        )
 
+        const status = error.response.status
         return core.setFailed(
           RenderErrorResponse[status as keyof typeof RenderErrorResponse] ||
-            'Unexpected error',
+          'Unexpected error',
         )
       }
       if (error instanceof Error) return core.setFailed(error.message)
