@@ -56,6 +56,9 @@
     "typescript-eslint": "^8.50.1",
     "vitest": "^4.0.16"
   },
+  "overrides": {
+    "conventional-changelog-conventionalcommits": "8.0.0"
+  },
   "lint-staged": {
     "*.{ts,js}": [
       "eslint --cache --fix"

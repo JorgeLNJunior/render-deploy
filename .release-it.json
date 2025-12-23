@@ -1,24 +1,18 @@
 {
+  "$schema": "https://unpkg.com/release-it/schema/release-it.json",
   "git": {
-    "commitMessage": "chore(release): v${version}",
-    "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
-    "tagName": "v${version}"
+    "commitMessage": "chore: release v${version}",
+    "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs"
   },
   "hooks": {
-    "after:bump": "npx auto-changelog -p --commit-limit false && git add CHANGELOG.md"
+    "after:bump": "npx auto-changelog -p"
   },
   "github": {
-    "release": true,
-    "releaseName": "Release v${version}"
-  },
-  "npm": {
-    "publish": false
+    "release": true
   },
   "plugins": {
     "@release-it/conventional-changelog": {
-      "preset": {
-        "name": "conventionalcommits"
-      },
+      "preset": "conventionalcommits",
       "infile": "CHANGELOG.md"
     }
   }
