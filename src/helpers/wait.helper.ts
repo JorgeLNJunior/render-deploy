@@ -5,9 +5,9 @@
  * @return {Promise<void>} A Promise that resolves after the specified number of seconds.
  */
 export async function wait(seconds: Seconds): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
 export enum Seconds {
-  TEN = 10
+  TEN = 10,
 }

@@ -1,4 +1,4 @@
-import {AxiosError, AxiosRequestHeaders} from 'axios'
+import { AxiosError, AxiosRequestHeaders } from 'axios'
 
 export function getAxiosError(status: number): AxiosError<unknown, unknown> {
   return new AxiosError(undefined, undefined, undefined, undefined, {
@@ -7,7 +7,7 @@ export function getAxiosError(status: number): AxiosError<unknown, unknown> {
     statusText: '',
     headers: {},
     config: {
-      headers: {} as AxiosRequestHeaders
-    }
+      headers: {} as AxiosRequestHeaders,
+    },
   })
 }

@@ -1,4 +1,4 @@
-import axios, {AxiosInstance} from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 export class RenderService {
   private client: AxiosInstance
@@ -7,8 +7,8 @@ export class RenderService {
     this.client = axios.create({
       baseURL: `https://api.render.com/v1/services/${options.serviceId}`,
       headers: {
-        authorization: `Bearer ${options.apiKey}`
-      }
+        authorization: `Bearer ${options.apiKey}`,
+      },
     })
   }
 
@@ -31,7 +31,7 @@ export class RenderService {
    */
   async triggerDeploy(options: DeployOptions): Promise<string> {
     const response = await this.client.post('/deploys', {
-      clearCache: options.clearCache ? 'clear' : 'do_not_clear'
+      clearCache: options.clearCache ? 'clear' : 'do_not_clear',
     })
     return response.data.id as string
   }
@@ -55,7 +55,7 @@ export class RenderService {
    */
   private async getCustomDomain(): Promise<string | undefined> {
     const response = await this.client.get('/custom-domains', {
-      params: {verificationStatus: 'verified'}
+      params: { verificationStatus: 'verified' },
     })
     return response.data[0]?.customDomain.name ?? undefined
   }
@@ -84,7 +84,7 @@ export enum RenderDeployStatus {
   CANCELED = 'canceled',
   QUEUED = 'queued',
   PRE_DEPLOY_IN_PROGRESS = 'pre_deploy_in_progress',
-  PRE_DEPLOY_FAILED = 'pre_deploy_failed'
+  PRE_DEPLOY_FAILED = 'pre_deploy_failed',
 }
 
 export const RenderErrorResponse = {
@@ -96,5 +96,5 @@ export const RenderErrorResponse = {
   410: 'The requested resource is no longer available.',
   429: 'Rate limit has been surpassed.',
   500: 'An unexpected server error has occurred.',
-  503: 'Server currently unavailable.'
+  503: 'Server currently unavailable.',
 }

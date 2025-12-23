@@ -7,7 +7,7 @@ export class GitHubService {
   constructor(config: GitHubConfig) {
     this.config = config
     this.octo = new Octokit({
-      auth: this.config.githubToken
+      auth: this.config.githubToken,
     })
   }
 
@@ -25,7 +25,7 @@ export class GitHubService {
       production_environment: true,
       required_contexts: [],
       environment,
-      ref
+      ref,
     })
     if (response.status === 201) return response.data.id
     throw new Error(`github api error: ${response.data.message}`)
@@ -42,14 +42,14 @@ export class GitHubService {
   async createDeploymentStatus(
     deploymentID: number,
     state: DeploymentState,
-    deploymentURL?: string
+    deploymentURL?: string,
   ): Promise<void> {
     await this.octo.rest.repos.createDeploymentStatus({
       owner: this.config.owner,
       repo: this.config.repo,
       deployment_id: deploymentID,
       environment_url: deploymentURL,
-      state
+      state,
     })
   }
 }
@@ -57,7 +57,7 @@ export class GitHubService {
 export enum DeploymentState {
   IN_PROGRESS = 'in_progress',
   SUCCESS = 'success',
-  FAILURE = 'failure'
+  FAILURE = 'failure',
 }
 
 interface GitHubConfig {

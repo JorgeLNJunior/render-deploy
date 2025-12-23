@@ -6,17 +6,17 @@ import { Seconds, wait } from './helpers/wait.helper.js'
 import {
   RenderDeployStatus,
   RenderErrorResponse,
-  RenderService
+  RenderService,
 } from './render.service.js'
 
 export default class Action {
   async run(): Promise<void> {
     try {
       const serviceId = core.getInput('service_id', { required: true })
-      core.debug(`service_id: ${serviceId}`);
+      core.debug(`service_id: ${serviceId}`)
       const apiKey = core.getInput('api_key', { required: true })
-      core.setSecret(apiKey);
-      core.debug(`api_key: ${apiKey}`);
+      core.setSecret(apiKey)
+      core.debug(`api_key: ${apiKey}`)
       const clearCache = core.getBooleanInput('clear_cache')
       core.debug(`clear_cache: ${clearCache}`)
       const waitDeploy = core.getBooleanInput('wait_deploy')
@@ -25,7 +25,7 @@ export default class Action {
       const createGithubDeployment = core.getBooleanInput('github_deployment')
       core.debug(`github_deployment: ${createGithubDeployment}`)
       const githubToken = core.getInput('github_token')
-      core.setSecret(githubToken);
+      core.setSecret(githubToken)
       core.debug(`github_token: ${githubToken}`)
       const environment = core.getInput('deployment_environment')
       core.debug(`deployment_environment: ${environment}`)
@@ -42,15 +42,23 @@ export default class Action {
       let deploymentId = 0
 
       if (createGithubDeployment) {
-        core.debug("Creating GitHub Deployment")
+        core.debug('Creating GitHub Deployment')
         deploymentId = await githubService.createDeployment(ref, environment)
         core.debug(`Created GitHub Deployment. Deployment ID: ${deploymentId}`)
         serviceUrl = await renderService.getServiceUrl()
         core.debug(`Render Service URL: ${serviceUrl}`)
-        const ghDeployState = waitDeploy ? DeploymentState.IN_PROGRESS : DeploymentState.SUCCESS;
-        const ghDeployUrl = waitDeploy ? undefined : serviceUrl;
-        core.debug(`Set GH Deployment state: ${ghDeployState}, url: ${waitDeploy ? "awaiting successful deploy" : ghDeployUrl}`)
-        await githubService.createDeploymentStatus(deploymentId, ghDeployState, ghDeployUrl)
+        const ghDeployState = waitDeploy
+          ? DeploymentState.IN_PROGRESS
+          : DeploymentState.SUCCESS
+        const ghDeployUrl = waitDeploy ? undefined : serviceUrl
+        core.debug(
+          `Set GH Deployment state: ${ghDeployState}, url: ${waitDeploy ? 'awaiting successful deploy' : ghDeployUrl}`,
+        )
+        await githubService.createDeploymentStatus(
+          deploymentId,
+          ghDeployState,
+          ghDeployUrl,
+        )
       }
 
       if (waitDeploy) {
@@ -65,18 +73,20 @@ export default class Action {
             RenderDeployStatus.CANCELED,
             RenderDeployStatus.DEACTIVATED,
             RenderDeployStatus.UPLOAD_FAILED,
-            RenderDeployStatus.PRE_DEPLOY_FAILED
+            RenderDeployStatus.PRE_DEPLOY_FAILED,
           ]
           await wait(Seconds.TEN)
           const status = await renderService.verifyDeployStatus(deployId)
 
           if (status === RenderDeployStatus.LIVE) {
             if (createGithubDeployment) {
-              core.debug(`Set GH Deployment state: ${DeploymentState.SUCCESS}, url: ${serviceUrl}`)
+              core.debug(
+                `Set GH Deployment state: ${DeploymentState.SUCCESS}, url: ${serviceUrl}`,
+              )
               await githubService.createDeploymentStatus(
                 deploymentId,
                 DeploymentState.SUCCESS,
-                serviceUrl
+                serviceUrl,
               )
             }
             waitStatus = false
@@ -88,7 +98,7 @@ export default class Action {
               core.debug(`Set GH Deployment state: ${DeploymentState.FAILURE}`)
               await githubService.createDeploymentStatus(
                 deploymentId,
-                DeploymentState.FAILURE
+                DeploymentState.FAILURE,
               )
             }
             return core.setFailed(`The deploy exited with status: ${status}.`)
@@ -107,7 +117,7 @@ export default class Action {
 
         return core.setFailed(
           RenderErrorResponse[status as keyof typeof RenderErrorResponse] ||
-          'Unexpected error'
+            'Unexpected error',
         )
       }
       if (error instanceof Error) return core.setFailed(error.message)
