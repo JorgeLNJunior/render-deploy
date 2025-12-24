@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { AxiosError } from 'axios'
+import { isAxiosError } from 'axios'
 
 import { DeploymentState, GitHubService } from './github.service.js'
 import { Seconds, wait } from './helpers/wait.helper.js'
@@ -111,7 +111,7 @@ export default class Action {
         }
       }
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.status) {
+      if (isAxiosError(error) && error.response?.status) {
         core.error(`Error response:\n${JSON.stringify(error.toJSON())}`)
         core.error(
           `${JSON.stringify({
