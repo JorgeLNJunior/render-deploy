@@ -30,6 +30,9 @@ inputs:
   commit_sha:
     required: false
     description: 'Specify what commit to deploy'
+  branch:
+    required: false
+    description: 'Specify what branch to deploy. Deploys the latest commit in this branch.'
 runs:
   using: 'node20'
   main: 'dist/index.js'
