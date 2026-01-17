@@ -105,6 +105,7 @@ describe('Inputs', () => {
     process.env['INPUT_SERVICE_ID'] = serviceID
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
+    process.env['INPUT_COMMIT_SHA'] = ''
     process.env['INPUT_BRANCH'] = branch
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
