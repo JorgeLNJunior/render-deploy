@@ -28,7 +28,7 @@ export class GitHubService {
       ref,
     })
     if (response.status === 201) return response.data.id
-    throw new Error(`github api error: ${response.data.message}`)
+    throw new Error(`GitHub API error: ${response.data.message}`)
   }
 
   /**

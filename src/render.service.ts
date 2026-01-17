@@ -58,7 +58,7 @@ export class RenderService {
   }
 
   /**
-   * Retrieves the service URL. Suports custom domains.
+   * Retrieves the service URL. Supports custom domains.
    *
    * @return {Promise<string>} The service URL.
    */
@@ -70,7 +70,7 @@ export class RenderService {
   }
 
   /**
-   * Retrieves the latest deploy trigered after a date.
+   * Retrieves the latest deploy triggered after a date.
    *
    * @param {DeployOptions} date - A date specified as an ISO 8601 timestamp.
    * @return {Promise<RenderDeployResponse | undefined>} The deploy data.

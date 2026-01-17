@@ -25,7 +25,7 @@ inputs:
     description: 'Github auth token'
   deployment_environment:
     required: false
-    description: 'The name of the GitHub deployment enviroment'
+    description: 'The name of the GitHub deployment environment'
     default: 'production'
 runs:
   using: 'node20'
