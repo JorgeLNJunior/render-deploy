@@ -45,6 +45,9 @@ describe('Inputs', () => {
   })
 
   test('should call render api with clear_cache option', async () => {
+    const clearCache = true
+    const commitSHA = ''
+
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
@@ -60,7 +63,37 @@ describe('Inputs', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith({
-      clearCache: true,
+      clearCache,
+      commitSHA,
+    })
+  })
+
+  test('should deploy a commit if specified', async () => {
+    const serviceID = 'my service id'
+    const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
+    const clearCache = false
+
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
+    process.env['INPUT_SERVICE_ID'] = serviceID
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
+    process.env['INPUT_COMMIT_SHA'] = commitSHA
+    process.env['INPUT_WAIT_DEPLOY'] = 'true'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
+
+    vi.spyOn(RenderService.prototype, 'triggerDeploy').mockResolvedValueOnce(
+      'id',
+    )
+    const spy = vi
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockResolvedValueOnce(RenderDeployStatus.LIVE)
+
+    await new Action().run()
+
+    expect(spy).toHaveBeenCalledWith({
+      clearCache,
+      commitSHA,
     })
   })
 })
