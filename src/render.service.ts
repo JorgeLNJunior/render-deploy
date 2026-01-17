@@ -37,7 +37,7 @@ export class RenderService {
 
     const response = await this.client.post('/deploys', {
       clearCache: options.clearCache ? 'clear' : 'do_not_clear',
-      commitId: options.commitId !== '' ? options.commitId : undefined,
+      commitId: options.commitSHA !== '' ? options.commitSHA : undefined,
     })
 
     if (response.status == 201) {
@@ -111,7 +111,7 @@ interface DeployOptions {
   /** Clear build cache. */
   clearCache?: boolean
   /** Specify what commit to deploy */
-  commitId?: string
+  commitSHA?: string
 }
 
 interface RenderOptions {

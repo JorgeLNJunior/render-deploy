@@ -42,7 +42,7 @@ export default class Action {
       )
       const deployId = await renderService.triggerDeploy({
         clearCache,
-        commitId: commitSHA,
+        commitSHA,
       })
       core.debug(`Deploy triggered. Deploy ID: ${deployId}`)
       let serviceUrl = ''
