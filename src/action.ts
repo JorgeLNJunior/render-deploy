@@ -21,6 +21,8 @@ export default class Action {
       core.debug(`clear_cache: ${clearCache}`)
       const waitDeploy = core.getBooleanInput('wait_deploy')
       core.debug(`wait_deploy: ${waitDeploy}`)
+      const commitSHA = core.getInput('commit_sha')
+      core.debug(`commit_sha: ${commitSHA}`)
 
       const createGithubDeployment = core.getBooleanInput('github_deployment')
       core.debug(`github_deployment: ${createGithubDeployment}`)
@@ -35,8 +37,13 @@ export default class Action {
 
       const renderService = new RenderService({ apiKey, serviceId })
       const githubService = new GitHubService({ githubToken, owner, repo })
-      core.debug(`Triggering Deploy on render.com for service ${serviceId}`)
-      const deployId = await renderService.triggerDeploy({ clearCache })
+      core.debug(
+        `Triggering Deploy on render.com for service ${serviceId}, commit: ${commitSHA}`,
+      )
+      const deployId = await renderService.triggerDeploy({
+        clearCache,
+        commitId: commitSHA,
+      })
       core.debug(`Deploy triggered. Deploy ID: ${deployId}`)
       let serviceUrl = ''
       let deploymentId = 0

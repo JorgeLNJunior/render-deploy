@@ -27,6 +27,9 @@ inputs:
     required: false
     description: 'The name of the GitHub deployment environment'
     default: 'production'
+  commit_sha:
+    required: false
+    description: 'Specify what commit to deploy'
 runs:
   using: 'node20'
   main: 'dist/index.js'
