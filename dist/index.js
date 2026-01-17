@@ -48015,7 +48015,7 @@ class GitHubService {
         });
         if (response.status === 201)
             return response.data.id;
-        throw new Error(`github api error: ${response.data.message}`);
+        throw new Error(`GitHub API error: ${response.data.message}`);
     }
     async createDeploymentStatus(deploymentID, state, deploymentURL) {
         await this.octo.rest.repos.createDeploymentStatus({
@@ -48025,6 +48025,17 @@ class GitHubService {
             environment_url: deploymentURL,
             state,
         });
+    }
+    async getBranchLatestCommit(branch) {
+        const response = await this.octo.rest.repos.getBranch({
+            owner: this.config.owner,
+            repo: this.config.repo,
+            branch,
+        });
+        if (response.status !== 200 && response.status !== 301) {
+            throw new Error(`Could not get branch "${branch}" for "${this.config.repo}/${this.config.owner}". Failed with "${response.status}"`);
+        }
+        return response.data.commit.sha;
     }
 }
 var DeploymentState;
@@ -48065,6 +48076,7 @@ class RenderService {
         const currentTime = new Date(Date.now() - 10000).toISOString();
         const response = await this.client.post('/deploys', {
             clearCache: options.clearCache ? 'clear' : 'do_not_clear',
+            commitId: options.commitSHA !== '' ? options.commitSHA : undefined,
         });
         if (response.status == 201) {
             return response.data.id;
@@ -48147,6 +48159,10 @@ class Action {
             core.debug(`clear_cache: ${clearCache}`);
             const waitDeploy = core.getBooleanInput('wait_deploy');
             core.debug(`wait_deploy: ${waitDeploy}`);
+            let commitSHA = core.getInput('commit_sha');
+            core.debug(`commit_sha: ${commitSHA}`);
+            const branch = core.getInput('branch');
+            core.debug(`branch: ${branch}`);
             const createGithubDeployment = core.getBooleanInput('github_deployment');
             core.debug(`github_deployment: ${createGithubDeployment}`);
             const githubToken = core.getInput('github_token');
@@ -48158,8 +48174,15 @@ class Action {
             const ref = process.env.GITHUB_REF;
             const renderService = new RenderService({ apiKey, serviceId });
             const githubService = new GitHubService({ githubToken, owner, repo });
-            core.debug(`Triggering Deploy on render.com for service ${serviceId}`);
-            const deployId = await renderService.triggerDeploy({ clearCache });
+            if (commitSHA === '' && branch !== '') {
+                core.debug(`Getting the latest commit for branch "${branch}"`);
+                commitSHA = await githubService.getBranchLatestCommit(branch);
+            }
+            core.debug(`Triggering Deploy on render.com for service ${serviceId}, commit: ${commitSHA}`);
+            const deployId = await renderService.triggerDeploy({
+                clearCache,
+                commitSHA,
+            });
             core.debug(`Deploy triggered. Deploy ID: ${deployId}`);
             let serviceUrl = '';
             let deploymentId = 0;

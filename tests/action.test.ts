@@ -16,7 +16,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  vi.clearAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('Inputs', () => {
@@ -45,6 +45,9 @@ describe('Inputs', () => {
   })
 
   test('should call render api with clear_cache option', async () => {
+    const clearCache = true
+    const commitSHA = ''
+
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_WAIT_DEPLOY'] = 'false'
@@ -60,7 +63,99 @@ describe('Inputs', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith({
-      clearCache: true,
+      clearCache,
+      commitSHA,
+    })
+  })
+
+  test('should deploy a commit if specified', async () => {
+    const serviceID = 'my service id'
+    const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
+    const clearCache = false
+
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
+    process.env['INPUT_SERVICE_ID'] = serviceID
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
+    process.env['INPUT_COMMIT_SHA'] = commitSHA
+    process.env['INPUT_WAIT_DEPLOY'] = 'true'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
+
+    const spy = vi
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockResolvedValueOnce('id')
+
+    await new Action().run()
+
+    expect(spy).toHaveBeenCalledWith({
+      clearCache,
+      commitSHA,
+    })
+  })
+
+  test('should deploy the latest commit of a branch if specified', async () => {
+    const serviceID = 'my service id'
+    const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
+    const branch = 'refactor-database-access'
+    const clearCache = false
+
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
+    process.env['INPUT_SERVICE_ID'] = serviceID
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
+    process.env['INPUT_COMMIT_SHA'] = ''
+    process.env['INPUT_BRANCH'] = branch
+    process.env['INPUT_WAIT_DEPLOY'] = 'true'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
+
+    const branchCommitSpy = vi
+      .spyOn(GitHubService.prototype, 'getBranchLatestCommit')
+      .mockResolvedValueOnce(commitSHA)
+    const deploySpy = vi
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockResolvedValueOnce('id')
+
+    await new Action().run()
+
+    expect(branchCommitSpy).toHaveBeenCalledWith(branch)
+    expect(deploySpy).toHaveBeenCalledWith({
+      clearCache,
+      commitSHA,
+    })
+  })
+
+  test('should prefer "commit_sha" instead of "branch" when both are specified', async () => {
+    const serviceID = 'my service id'
+    const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
+    const branch = 'refactor-database-access'
+    const clearCache = false
+
+    process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_REF'] = 'main'
+    process.env['INPUT_SERVICE_ID'] = serviceID
+    process.env['INPUT_API_KEY'] = 'my api key'
+    process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
+    process.env['INPUT_COMMIT_SHA'] = commitSHA
+    process.env['INPUT_BRANCH'] = branch
+    process.env['INPUT_WAIT_DEPLOY'] = 'true'
+    process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
+
+    const branchCommitSpy = vi.spyOn(
+      GitHubService.prototype,
+      'getBranchLatestCommit',
+    )
+    const deploySpy = vi
+      .spyOn(RenderService.prototype, 'triggerDeploy')
+      .mockResolvedValueOnce('id')
+
+    await new Action().run()
+
+    expect(branchCommitSpy).not.toHaveBeenCalled()
+    expect(deploySpy).toHaveBeenCalledWith({
+      clearCache,
+      commitSHA,
     })
   })
 })

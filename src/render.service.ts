@@ -37,6 +37,7 @@ export class RenderService {
 
     const response = await this.client.post('/deploys', {
       clearCache: options.clearCache ? 'clear' : 'do_not_clear',
+      commitId: options.commitSHA !== '' ? options.commitSHA : undefined,
     })
 
     if (response.status == 201) {
@@ -58,7 +59,7 @@ export class RenderService {
   }
 
   /**
-   * Retrieves the service URL. Suports custom domains.
+   * Retrieves the service URL. Supports custom domains.
    *
    * @return {Promise<string>} The service URL.
    */
@@ -70,7 +71,7 @@ export class RenderService {
   }
 
   /**
-   * Retrieves the latest deploy trigered after a date.
+   * Retrieves the latest deploy triggered after a date.
    *
    * @param {DeployOptions} date - A date specified as an ISO 8601 timestamp.
    * @return {Promise<RenderDeployResponse | undefined>} The deploy data.
@@ -109,6 +110,8 @@ export class RenderService {
 interface DeployOptions {
   /** Clear build cache. */
   clearCache?: boolean
+  /** Specify what commit to deploy */
+  commitSHA?: string
 }
 
 interface RenderOptions {

@@ -116,6 +116,8 @@ deploy:
 | `github_deployment` | Whether to create a GitHub deployment status.                                                            | No       | `false` |
 | `deployment_environment` | The name of the deployment environment (e.g., 'production', 'staging'). Required if `github_deployment` is true. | No       |  `production`  |
 | `github_token`       | The GitHub token. Required if `github_deployment` is true. Use `${{ secrets.GITHUB_TOKEN }}`.            | No       |         |
+| `commit_sha`         | Specify what commit to deploy. **Note:** Takes precedence over `branch`.                                | No       |         |
+| `branch`             | Specify what branch to deploy. Deploys the latest commit in this branch. **Note:** Requires `github_token` to be specified in private repositories to resolve the branch to a SHA. | No       |         |
 
 
 ## License

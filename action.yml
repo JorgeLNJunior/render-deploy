@@ -21,12 +21,18 @@ inputs:
     description: 'Creates a github deployment'
     default: 'false'
   github_token:
-    required: true
+    required: false
     description: 'Github auth token'
   deployment_environment:
     required: false
-    description: 'The name of the GitHub deployment enviroment'
+    description: 'The name of the GitHub deployment environment'
     default: 'production'
+  commit_sha:
+    required: false
+    description: 'Specify what commit to deploy'
+  branch:
+    required: false
+    description: 'Specify what branch to deploy. Deploys the latest commit in this branch.'
 runs:
   using: 'node20'
   main: 'dist/index.js'

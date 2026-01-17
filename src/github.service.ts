@@ -28,7 +28,7 @@ export class GitHubService {
       ref,
     })
     if (response.status === 201) return response.data.id
-    throw new Error(`github api error: ${response.data.message}`)
+    throw new Error(`GitHub API error: ${response.data.message}`)
   }
 
   /**
@@ -51,6 +51,28 @@ export class GitHubService {
       environment_url: deploymentURL,
       state,
     })
+  }
+
+  /**
+   * Retrieves the latest commit SHA for a specific branch.
+   *
+   * @param {string} branch - The name of the branch.
+   * @return {Promise<string>} The SHA of the latest commit.
+   */
+  async getBranchLatestCommit(branch: string): Promise<string> {
+    const response = await this.octo.rest.repos.getBranch({
+      owner: this.config.owner,
+      repo: this.config.repo,
+      branch,
+    })
+
+    if (response.status !== 200 && response.status !== 301) {
+      throw new Error(
+        `Could not get branch "${branch}" for "${this.config.owner}/${this.config.repo}". Failed with "${response.status}"`,
+      )
+    }
+
+    return response.data.commit.sha
   }
 }
 
