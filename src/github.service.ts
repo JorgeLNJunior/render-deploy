@@ -68,7 +68,7 @@ export class GitHubService {
 
     if (response.status !== 200 && response.status !== 301) {
       throw new Error(
-        `Could not get branch "${branch}" for "${this.config.repo}/${this.config.owner}". Failed with "${response.status}"`,
+        `Could not get branch "${branch}" for "${this.config.owner}/${this.config.repo}". Failed with "${response.status}"`,
       )
     }
 
