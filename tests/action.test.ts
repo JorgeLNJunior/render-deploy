@@ -82,12 +82,9 @@ describe('Inputs', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    vi.spyOn(RenderService.prototype, 'triggerDeploy').mockResolvedValueOnce(
-      'id',
-    )
     const spy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
-      .mockResolvedValueOnce(RenderDeployStatus.LIVE)
+      .mockResolvedValueOnce('id')
 
     await new Action().run()
 
@@ -112,20 +109,17 @@ describe('Inputs', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    vi.spyOn(RenderService.prototype, 'triggerDeploy').mockResolvedValueOnce(
-      'id',
-    )
-    vi.spyOn(
-      GitHubService.prototype,
-      'getBranchLatestCommit',
-    ).mockResolvedValueOnce(commitSHA)
-    const spy = vi
+    const branchCommitSpy = vi
+      .spyOn(GitHubService.prototype, 'getBranchLatestCommit')
+      .mockResolvedValueOnce(commitSHA)
+    const deploySpy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
-      .mockResolvedValueOnce(RenderDeployStatus.LIVE)
+      .mockResolvedValueOnce('id')
 
     await new Action().run()
 
-    expect(spy).toHaveBeenCalledWith({
+    expect(branchCommitSpy).toHaveBeenCalledWith(branch)
+    expect(deploySpy).toHaveBeenCalledWith({
       clearCache,
       commitSHA,
     })
@@ -147,16 +141,13 @@ describe('Inputs', () => {
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    vi.spyOn(RenderService.prototype, 'triggerDeploy').mockResolvedValueOnce(
-      'id',
-    )
     const branchCommitSpy = vi.spyOn(
       GitHubService.prototype,
       'getBranchLatestCommit',
     )
     const deploySpy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
-      .mockResolvedValueOnce(RenderDeployStatus.LIVE)
+      .mockResolvedValueOnce('id')
 
     await new Action().run()
 
