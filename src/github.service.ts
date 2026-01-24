@@ -32,6 +32,30 @@ export class GitHubService {
   }
 
   /**
+   * Resolves a reference (branch, tag, or SHA) to a full commit SHA using the GitHub API.
+   *
+   * @param {string} ref - The reference to resolve.
+   * @return {Promise<string>} The resolved commit SHA.
+   */
+  async resolveRef(ref: string): Promise<string> {
+    try {
+      const { data } = await this.octo.rest.repos.getCommit({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        ref,
+      })
+      return data.sha
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(
+          `GitHub API Error resolving ref "${ref}": ${error.message}`,
+        )
+      }
+      throw new Error(`GitHub API Error resolving ref "${ref}": ${error}`)
+    }
+  }
+
+  /**
    * Creates a deployment status for a given deployment ID.
    *
    * @param {number} deploymentID - The ID of the deployment.
@@ -51,28 +75,6 @@ export class GitHubService {
       environment_url: deploymentURL,
       state,
     })
-  }
-
-  /**
-   * Retrieves the latest commit SHA for a specific branch.
-   *
-   * @param {string} branch - The name of the branch.
-   * @return {Promise<string>} The SHA of the latest commit.
-   */
-  async getBranchLatestCommit(branch: string): Promise<string> {
-    const response = await this.octo.rest.repos.getBranch({
-      owner: this.config.owner,
-      repo: this.config.repo,
-      branch,
-    })
-
-    if (response.status !== 200 && response.status !== 301) {
-      throw new Error(
-        `Could not get branch "${branch}" for "${this.config.owner}/${this.config.repo}". Failed with "${response.status}"`,
-      )
-    }
-
-    return response.data.commit.sha
   }
 }
 
