@@ -24,6 +24,7 @@ export class GitHubService {
       repo: this.config.repo,
       production_environment: true,
       required_contexts: [],
+      auto_merge: false,
       environment,
       ref,
     })
