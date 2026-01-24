@@ -27,12 +27,9 @@ inputs:
     required: false
     description: 'The name of the GitHub deployment environment'
     default: 'production'
-  commit_sha:
+  ref:
     required: false
-    description: 'Specify what commit to deploy'
-  branch:
-    required: false
-    description: 'Specify what branch to deploy. Deploys the latest commit in this branch.'
+    description: 'Specify what git ref to deploy. If a branch, deploys the latest commit in this branch. If a tag, deploys the commit related to that tag.'
 runs:
   using: 'node20'
   main: 'dist/index.js'
