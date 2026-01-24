@@ -11,12 +11,16 @@ import {
 } from '../src/render.service.js'
 import { getAxiosError } from './helpers/axios.helper.js'
 
+const originalEnv = process.env
+
 beforeEach(() => {
   vi.spyOn(WaitHelper, 'wait').mockResolvedValue()
+  process.env = { ...originalEnv }
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
+  process.env = originalEnv
 })
 
 describe('Inputs', () => {
@@ -46,7 +50,7 @@ describe('Inputs', () => {
 
   test('should call render api with clear_cache option', async () => {
     const clearCache = true
-    const commitSHA = ''
+    const commitSHA = 'default-sha'
 
     process.env['INPUT_SERVICE_ID'] = 'my service id'
     process.env['INPUT_API_KEY'] = 'my api key'
@@ -54,6 +58,7 @@ describe('Inputs', () => {
     process.env['INPUT_CLEAR_CACHE'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
     process.env['GITHUB_REPOSITORY'] = 'action/test'
+    process.env['GITHUB_SHA'] = commitSHA
 
     const spy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
@@ -68,7 +73,7 @@ describe('Inputs', () => {
     })
   })
 
-  test('should deploy a commit if specified', async () => {
+  test('should deploy a commit if specified via ref', async () => {
     const serviceID = 'my service id'
     const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
     const clearCache = false
@@ -78,9 +83,13 @@ describe('Inputs', () => {
     process.env['INPUT_SERVICE_ID'] = serviceID
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
-    process.env['INPUT_COMMIT_SHA'] = commitSHA
+    process.env['INPUT_REF'] = commitSHA
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
+
+    const resolveRefSpy = vi
+      .spyOn(GitHubService.prototype, 'resolveRef')
+      .mockResolvedValueOnce(commitSHA)
 
     const spy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
@@ -88,13 +97,14 @@ describe('Inputs', () => {
 
     await new Action().run()
 
+    expect(resolveRefSpy).toHaveBeenCalledWith(commitSHA)
     expect(spy).toHaveBeenCalledWith({
       clearCache,
       commitSHA,
     })
   })
 
-  test('should deploy the latest commit of a branch if specified', async () => {
+  test('should deploy the latest commit of a branch if specified via ref', async () => {
     const serviceID = 'my service id'
     const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
     const branch = 'refactor-database-access'
@@ -105,57 +115,58 @@ describe('Inputs', () => {
     process.env['INPUT_SERVICE_ID'] = serviceID
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
-    process.env['INPUT_COMMIT_SHA'] = ''
-    process.env['INPUT_BRANCH'] = branch
+    process.env['INPUT_REF'] = branch
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const branchCommitSpy = vi
-      .spyOn(GitHubService.prototype, 'getBranchLatestCommit')
+    const resolveRefSpy = vi
+      .spyOn(GitHubService.prototype, 'resolveRef')
       .mockResolvedValueOnce(commitSHA)
+
     const deploySpy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
 
     await new Action().run()
 
-    expect(branchCommitSpy).toHaveBeenCalledWith(branch)
+    expect(resolveRefSpy).toHaveBeenCalledWith(branch)
     expect(deploySpy).toHaveBeenCalledWith({
       clearCache,
       commitSHA,
     })
   })
 
-  test('should prefer "commit_sha" instead of "branch" when both are specified', async () => {
+  test('should prefer "ref" input over "GITHUB_SHA" env var', async () => {
     const serviceID = 'my service id'
-    const commitSHA = '7723293c4a49e7b3aa60ba196baf9a5a0bc5fc02'
-    const branch = 'refactor-database-access'
+    const envSHA = 'env-sha'
+    const refSHA = 'ref-sha'
+    const ref = 'some-ref'
     const clearCache = false
 
     process.env['GITHUB_REPOSITORY'] = 'action/test'
     process.env['GITHUB_REF'] = 'main'
+    process.env['GITHUB_SHA'] = envSHA
     process.env['INPUT_SERVICE_ID'] = serviceID
     process.env['INPUT_API_KEY'] = 'my api key'
     process.env['INPUT_CLEAR_CACHE'] = String(clearCache)
-    process.env['INPUT_COMMIT_SHA'] = commitSHA
-    process.env['INPUT_BRANCH'] = branch
+    process.env['INPUT_REF'] = ref
     process.env['INPUT_WAIT_DEPLOY'] = 'true'
     process.env['INPUT_GITHUB_DEPLOYMENT'] = 'false'
 
-    const branchCommitSpy = vi.spyOn(
-      GitHubService.prototype,
-      'getBranchLatestCommit',
-    )
+    const resolveRefSpy = vi
+      .spyOn(GitHubService.prototype, 'resolveRef')
+      .mockResolvedValueOnce(refSHA)
+
     const deploySpy = vi
       .spyOn(RenderService.prototype, 'triggerDeploy')
       .mockResolvedValueOnce('id')
 
     await new Action().run()
 
-    expect(branchCommitSpy).not.toHaveBeenCalled()
+    expect(resolveRefSpy).toHaveBeenCalledWith(ref)
     expect(deploySpy).toHaveBeenCalledWith({
       clearCache,
-      commitSHA,
+      commitSHA: refSHA,
     })
   })
 })
