@@ -52,7 +52,7 @@ This is the simplest way to use the action. It triggers a deployment using the s
 deploy:
   runs-on: ubuntu-latest
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.7
+    - uses: JorgeLNJunior/render-deploy@v1.5.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -66,7 +66,7 @@ If you want the GitHub Action to wait until the Render deployment is complete (s
 deploy:
   runs-on: ubuntu-latest
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.7
+    - uses: JorgeLNJunior/render-deploy@v1.5.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -83,7 +83,7 @@ deploy:
   permissions:
     deployments: write
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.7
+    - uses: JorgeLNJunior/render-deploy@v1.5.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -101,7 +101,7 @@ deploy:
   runs-on: ubuntu-latest
 
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.7
+    - uses: JorgeLNJunior/render-deploy@v1.5.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -116,7 +116,7 @@ deploy:
   permissions:
     contents: read # Required for private repos
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.7
+    - uses: JorgeLNJunior/render-deploy@v1.5.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
@@ -135,13 +135,13 @@ deploy:
     deployments: write
     contents: read
   steps:
-    - uses: JorgeLNJunior/render-deploy@v1.4.7
+    - uses: JorgeLNJunior/render-deploy@v1.5.0
       with:
         service_id: ${{ secrets.RENDER_SERVICE_ID }}
         api_key: ${{ secrets.RENDER_API_KEY }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        ref: 'feat/new-feature' # Optional: Deploy specific ref
-        clear_cache: true # Optional: Clear Render's build cache
+        ref: 'feat/new-feature'
+        clear_cache: true
         wait_deploy: true
         github_deployment: true
         deployment_environment: 'production'
