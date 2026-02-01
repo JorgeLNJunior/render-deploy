@@ -48082,7 +48082,7 @@ class RenderService {
         const currentTime = new Date(Date.now() - 10000).toISOString();
         const response = await this.client.post('/deploys', {
             clearCache: options.clearCache ? 'clear' : 'do_not_clear',
-            commitId: options.commitSHA !== '' ? options.commitSHA : undefined,
+            commitId: options.commitSHA ? options.commitSHA : undefined,
         });
         if (response.status == 201) {
             return response.data.id;
