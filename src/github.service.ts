@@ -24,11 +24,36 @@ export class GitHubService {
       repo: this.config.repo,
       production_environment: true,
       required_contexts: [],
+      auto_merge: false,
       environment,
       ref,
     })
     if (response.status === 201) return response.data.id
-    throw new Error(`github api error: ${response.data.message}`)
+    throw new Error(`GitHub API error: ${response.data.message}`)
+  }
+
+  /**
+   * Resolves a reference (branch, tag, or SHA) to a full commit SHA using the GitHub API.
+   *
+   * @param {string} ref - The reference to resolve.
+   * @return {Promise<string>} The resolved commit SHA.
+   */
+  async resolveRef(ref: string): Promise<string> {
+    try {
+      const { data } = await this.octo.rest.repos.getCommit({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        ref,
+      })
+      return data.sha
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(
+          `GitHub API Error resolving ref "${ref}": ${error.message}`,
+        )
+      }
+      throw new Error(`GitHub API Error resolving ref "${ref}": ${error}`)
+    }
   }
 
   /**

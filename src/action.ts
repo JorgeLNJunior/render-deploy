@@ -21,6 +21,8 @@ export default class Action {
       core.debug(`clear_cache: ${clearCache}`)
       const waitDeploy = core.getBooleanInput('wait_deploy')
       core.debug(`wait_deploy: ${waitDeploy}`)
+      const ref = core.getInput('ref')
+      core.debug(`ref: ${ref}`)
 
       const createGithubDeployment = core.getBooleanInput('github_deployment')
       core.debug(`github_deployment: ${createGithubDeployment}`)
@@ -31,19 +33,34 @@ export default class Action {
       core.debug(`deployment_environment: ${environment}`)
 
       const [owner, repo] = (process.env.GITHUB_REPOSITORY as string).split('/')
-      const ref = process.env.GITHUB_REF as string
 
       const renderService = new RenderService({ apiKey, serviceId })
       const githubService = new GitHubService({ githubToken, owner, repo })
-      core.debug(`Triggering Deploy on render.com for service ${serviceId}`)
-      const deployId = await renderService.triggerDeploy({ clearCache })
+
+      let commitSHA = process.env.GITHUB_SHA as string
+      if (ref) {
+        core.debug(`Resolving ref "${ref}" to a commit SHA...`)
+        commitSHA = await githubService.resolveRef(ref)
+        core.debug(`Resolved ref "${ref}" to commit "${commitSHA}"`)
+      }
+
+      core.debug(
+        `Triggering Deploy on render.com for service ${serviceId}, commit: ${commitSHA}`,
+      )
+      const deployId = await renderService.triggerDeploy({
+        clearCache,
+        commitSHA,
+      })
       core.debug(`Deploy triggered. Deploy ID: ${deployId}`)
       let serviceUrl = ''
       let deploymentId = 0
 
       if (createGithubDeployment) {
         core.debug('Creating GitHub Deployment')
-        deploymentId = await githubService.createDeployment(ref, environment)
+        deploymentId = await githubService.createDeployment(
+          commitSHA,
+          environment,
+        )
         core.debug(`Created GitHub Deployment. Deployment ID: ${deploymentId}`)
         serviceUrl = await renderService.getServiceUrl()
         core.debug(`Render Service URL: ${serviceUrl}`)

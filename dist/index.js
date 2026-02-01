@@ -48010,12 +48010,29 @@ class GitHubService {
             repo: this.config.repo,
             production_environment: true,
             required_contexts: [],
+            auto_merge: false,
             environment,
             ref,
         });
         if (response.status === 201)
             return response.data.id;
-        throw new Error(`github api error: ${response.data.message}`);
+        throw new Error(`GitHub API error: ${response.data.message}`);
+    }
+    async resolveRef(ref) {
+        try {
+            const { data } = await this.octo.rest.repos.getCommit({
+                owner: this.config.owner,
+                repo: this.config.repo,
+                ref,
+            });
+            return data.sha;
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`GitHub API Error resolving ref "${ref}": ${error.message}`);
+            }
+            throw new Error(`GitHub API Error resolving ref "${ref}": ${error}`);
+        }
     }
     async createDeploymentStatus(deploymentID, state, deploymentURL) {
         await this.octo.rest.repos.createDeploymentStatus({
@@ -48065,6 +48082,7 @@ class RenderService {
         const currentTime = new Date(Date.now() - 10000).toISOString();
         const response = await this.client.post('/deploys', {
             clearCache: options.clearCache ? 'clear' : 'do_not_clear',
+            commitId: options.commitSHA !== '' ? options.commitSHA : undefined,
         });
         if (response.status == 201) {
             return response.data.id;
@@ -48147,6 +48165,8 @@ class Action {
             core.debug(`clear_cache: ${clearCache}`);
             const waitDeploy = core.getBooleanInput('wait_deploy');
             core.debug(`wait_deploy: ${waitDeploy}`);
+            const ref = core.getInput('ref');
+            core.debug(`ref: ${ref}`);
             const createGithubDeployment = core.getBooleanInput('github_deployment');
             core.debug(`github_deployment: ${createGithubDeployment}`);
             const githubToken = core.getInput('github_token');
@@ -48155,17 +48175,25 @@ class Action {
             const environment = core.getInput('deployment_environment');
             core.debug(`deployment_environment: ${environment}`);
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-            const ref = process.env.GITHUB_REF;
             const renderService = new RenderService({ apiKey, serviceId });
             const githubService = new GitHubService({ githubToken, owner, repo });
-            core.debug(`Triggering Deploy on render.com for service ${serviceId}`);
-            const deployId = await renderService.triggerDeploy({ clearCache });
+            let commitSHA = process.env.GITHUB_SHA;
+            if (ref) {
+                core.debug(`Resolving ref "${ref}" to a commit SHA...`);
+                commitSHA = await githubService.resolveRef(ref);
+                core.debug(`Resolved ref "${ref}" to commit "${commitSHA}"`);
+            }
+            core.debug(`Triggering Deploy on render.com for service ${serviceId}, commit: ${commitSHA}`);
+            const deployId = await renderService.triggerDeploy({
+                clearCache,
+                commitSHA,
+            });
             core.debug(`Deploy triggered. Deploy ID: ${deployId}`);
             let serviceUrl = '';
             let deploymentId = 0;
             if (createGithubDeployment) {
                 core.debug('Creating GitHub Deployment');
-                deploymentId = await githubService.createDeployment(ref, environment);
+                deploymentId = await githubService.createDeployment(commitSHA, environment);
                 core.debug(`Created GitHub Deployment. Deployment ID: ${deploymentId}`);
                 serviceUrl = await renderService.getServiceUrl();
                 core.debug(`Render Service URL: ${serviceUrl}`);
